@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signup</title>
+</head>
+
+<body>
+  <form method="post">
+    {% csrf_token %}
+    <input type="email" placeholder="Email" name="email" id="email">
+    <input type="password" placeholder="Password" name="password" id="password">
+    <input type="password" placeholder="Enter Password Again" name="confirm_password" id="confirm_password">
+    <select name="gender" id="cars">
+      <option value="Male">Male</option>
+      <option value="Female">Saab</option>
+    </select>
+    <input type="number" name="age" id="age" placeholder="Age">
+    <input type="submit" value="Sign Up">
+  </form>
+
+  {% for message in messages %}
+  <div class="alert alert-{{ message.tags }}">
+    <a class="close" data-dismiss="alert">×</a>
+    {{ message|safe }}
+  </div>
+  {% endfor %}
+</body>
+
+</html>

@@ -19,5 +19,6 @@ from django.urls import path,include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("ajax/",include("ajax.urls")) #route starts with ajax/ than call from ajax application
+    path("ajax/",include("ajax.urls")), #route starts with ajax/ than call from ajax application
+    path("auth/",include("users.urls"))
 ]
