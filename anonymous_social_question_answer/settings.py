@@ -27,6 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+#registering the login URL
+LOGIN_URL = '/auth/signup'
+
 
 # Application definition
 
