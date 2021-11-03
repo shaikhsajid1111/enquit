@@ -7,7 +7,8 @@ def get_image(gender,age):
   try:
     url = "https://fakeface.rest/face/json?maximum_age={}&gender={}"\
       .format(age,gender)
-    response = requests.get(url).json()
+    print("URL",url)
+    response = requests.get(url.lower()).json()
     return response['image_url']
   except Exception as ex:
     print("Get Image: ",ex)
