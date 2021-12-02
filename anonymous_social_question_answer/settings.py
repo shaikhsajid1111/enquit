@@ -12,15 +12,21 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+import environ
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+#To read environment variable
+env = environ.Env()
+environ.Env.read_env()
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-c^=&s3*i&w^^#4sct1@dhg=_lhpdk1n+vu!dmnh6)yc=055dxu'
+SECRET_KEY = env('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -129,3 +135,33 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+
+# Cloudinary settings for Django. Add to your settings file.
+CLOUDINARY = {
+  'cloud_name': env('CLOUDINARY_NAME'),
+  'api_key': env('CLOUDINARY_API_KEY'),
+  'api_secret': env('CLOUDINARY_API_SECRET'),
+}
+
+# Cloudinary settings using python code. Run before pycloudinary is used.
+import cloudinary
+
+cloudinary.config(
+  cloud_name = env('CLOUDINARY_NAME'),
+  api_key = env('CLOUDINARY_API_KEY'),
+  api_secret=env('CLOUDINARY_API_SECRET')
+)
+
+"""Email settings below"""
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+#sender's email-id
+EMAIL_HOST_USER = env('EMAIL_HOST')
+# password associated with above email-id
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
