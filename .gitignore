@@ -1,3 +1,6 @@
 /*/__*__/
 db.sqlite3
 ajax/migrations
+/users/migrations
+/*/*.env
+*.env
