@@ -1,5 +1,11 @@
 {% autoescape off %}
-Hi {{user.username}},
-Please click on the link to confirm your registration,
+Hello, Thank You for joining <application_name>, Our System have decided to call you by name {{user.username}},
+but before being able to use your account you need to verify that this is your email address by clicking the link below.
+
 http://{{ domain }}{% url 'activate' uid64=uid token=token %}
+
+
+Regards,
+Team <application_name>
+
 {% endautoescape %}

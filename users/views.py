@@ -122,7 +122,7 @@ def signUp(request):
                         user=user, profile_picture_link=image, is_verified=False)
                     custom_user.save()  # save the user
                     # the email subject that will be sent to users for account activation
-                    mail_subject = "Activate Your Accouny By Verifiying with us!"
+                    mail_subject = "Activate Your Account By Verifiying with us!"
                     # variable to fetch the current site detail
                     current_site = get_current_site(request)
                     # convert the HTML file into string that will be sent via Email
