@@ -13,6 +13,7 @@ def home(request):
       posts = Post.objects.all()[:10]
       posts_data = []
       for post in posts:
+        print(post.author.id == request.user.id)
         data = {}
         try:
           images = Images.objects.filter(post=post)
@@ -29,3 +30,14 @@ def home(request):
   except Exception as ex:
     print("Home Route: ",ex)
     return redirect("/auth/signup")
+
+def search(request):
+  if request.method == "GET":
+    query = request.GET['query']
+    if query != "":
+      if query.startswith("@"):
+        return render(request, "search.html", {"data": CustomUser.objects.filter(user__username__contains=str(query).removeprefix("@")),"type":"user"})
+      else:
+        return render(request, "search.html", {"data": Post.objects.filter(text__contains=str(query)),"type":"post"})
+    else:
+      return redirect("/home")

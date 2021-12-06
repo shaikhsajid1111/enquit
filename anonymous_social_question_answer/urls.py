@@ -19,7 +19,8 @@ from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("home/",views.home),
+    path("home/",views.home,name="home"),
+    path("search/", views.search, name="search"),
     path("ajax/",include("ajax.urls")), #route starts with ajax/ than call from ajax application
     path("auth/",include("users.urls")),
     path("post/", include("post.urls")),
