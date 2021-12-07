@@ -15,7 +15,8 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_text
 from django.utils.encoding import force_text
 import environ
-
+from post.models import Post,Images
+import cloudinary.uploader
 # To read environment variable
 env = environ.Env()
 environ.Env.read_env()
@@ -69,7 +70,15 @@ def delete_user(request):
         if user is not None:
             # if user matched the given credentials
             logout(request)  # log out first and clear the sessions
-            user.delete()  # delete the user from the database
+            custom_user = CustomUser.objects.get(user=user)
+            users_posts = Post.objects.filter(author=custom_user)
+            for post in users_posts:
+              images = Images.objects.filter(post=post)
+              for image in images:
+                cloudinary.uploader.destroy(image.public_id)
+              post.delete()
+            custom_user.delete()  # delete the user from the database
+            user.delete()
             # just a message to express sad that user is leaving the site
             messages.info(request, "Its sad to let you go :(")
             return redirect("/auth/login")  # redirect them back to login
