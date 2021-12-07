@@ -48,3 +48,11 @@ def delete_post(request,id):
       post.delete()
       messages.success(request, "Post deleted!")
       return redirect("/home")
+
+
+@login_required(login_url="/auth/login")
+def view_post(request,post_id):
+  if request.method == "GET":
+    post = Post.objects.get(post_id=post_id)
+    return render(request,"post_details.html",{"post_data":post})
+  

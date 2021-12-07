@@ -5,5 +5,6 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path("create_post", views.create_post, name="create_post"),
     path("delete_post/<id>", views.delete_post, name="delete_post"),
+    path("view/<post_id>", views.view_post, name="view_post"),
 
 ]
