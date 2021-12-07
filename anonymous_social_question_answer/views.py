@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from users.models import CustomUser
 from django.shortcuts import render,redirect
 from django.contrib import messages
-from post.models import Images, Post
+from post.models import Images, Post, Vote
 
 @login_required
 def home(request):
@@ -13,15 +13,25 @@ def home(request):
       posts = Post.objects.all()[:10]
       posts_data = []
       for post in posts:
-        print(post.author.id == request.user.id)
         data = {}
+        already_voted = Vote.objects.filter(
+            user=user_data,post=post) and True or False
+        try:
+          votes = Vote.objects.filter(post=post).count()
+        except Vote.DoesNotExist:
+          votes = 0
+        data['votes'] = votes
+
         try:
           images = Images.objects.filter(post=post)
         except Images.DoesNotExist:
           images = []
         data['images'] = images
         data['post'] = post
+        data['already_voted'] = already_voted
         posts_data.append(data)
+
+      print(posts_data)
       return render(request, "home.html", {"user_data": user_data,"posts_data":(posts_data)}) #send the data to home page as well
     else:
       #if the user is unauthenticated
