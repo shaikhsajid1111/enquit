@@ -9,5 +9,16 @@
 <body>
   {{post_data.author.user.username}}
   {{ post_data.posted_on }}
+  <h2>{{ post_data.text }}</h2>
+
+
+  Answers:
+
+  <form action="post_comment/{{ post_data.post_id }}" method="post">
+    {% csrf_token %}
+    <input type="text" name="text">
+    <input type="hidden" name="sno" value="{{post_data.post_id}}">
+    <input type="submit" value="Post">
+  </form>
 </body>
 </html>
