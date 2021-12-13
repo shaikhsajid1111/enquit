@@ -1,33 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home Page</title>
-</head>
-<body>
+{% extends "base_layout.html" %}
 
+{% block content %}
 {{user}}
-<br>
+
 {{user.email}}
-    <img width="50px" height="50px" src="{{user_data.profile_picture_link}}" alt="">
+<img width="50px" height="50px" src="{{user_data.profile_picture_link}}" alt="">
 {% for post in posts_data %}
 <br>
-  Number of votes:  {{ post.votes }}
-  <h2>Post</h2>
-  <h3>{{ post.post.text }}</h3>
-  <form action="/ajax/vote_post/{{post.post.post_id}}" method="post">
-    {% csrf_token %}
-    <input type="submit" value="Vote">
-  </form>
-  <form action="/ajax/report_post/{{post.post.post_id}}" method="post">
-    {% csrf_token %}
-    <input type="submit" value="Report">
-  </form>
-  {% for image in post.images %}
-    <img src="{{ image.url }}" width="50" height="50" alt="">
-  {% endfor %}
+Number of votes: {{ post.votes }}
+<h2>Post</h2>
+<h3>{{ post.post.text }}</h3>
+<form action="/ajax/vote_post/{{post.post.post_id}}" method="post">
+  {% csrf_token %}
+  <input type="submit" class="btn btn-secondary" value="Vote">
+</form>
+<form action="/ajax/report_post/{{post.post.post_id}}" method="post">
+  {% csrf_token %}
+  <input type="submit" class="btn btn-danger" value="Report">
+</form>
+{% for image in post.images %}
+<img src="{{ image.url }}" width="50" height="50" alt="">
 {% endfor %}
-  </body>
-</html>
+{% endfor %}
+{% load static %}
+<script>
+  document.title = "Feed - {{ user }}"
+</script>
+<script src="{% static 'js/home.js' %}"></script>
+{% endblock %}
