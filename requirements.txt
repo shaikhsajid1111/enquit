@@ -1,0 +1,4 @@
+cloudinary==1.26.0
+Django==3.2.8
+django-environ==0.8.1
+django-utils-six==2.0
