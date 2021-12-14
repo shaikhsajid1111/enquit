@@ -1,8 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Post,Images,Vote,Report
-
+from .models import Post,Images,Vote,Report,Answer
 class PostAdmin(admin.ModelAdmin):
   list_display = ('post_id','author','posted_on','text')
   search_field = ['text','author']
@@ -31,3 +30,4 @@ class ReportAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Report,ReportAdmin)
+admin.site.register(Answer)
