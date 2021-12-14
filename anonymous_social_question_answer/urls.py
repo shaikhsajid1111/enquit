@@ -18,11 +18,11 @@ from django.urls import path,include
 from . import views
 
 urlpatterns = [
+    path("",views.home,name="home"),
     path('admin/', admin.site.urls),
-    path("home/",views.home,name="home"),
     path("search/", views.search, name="search"),
     path("ajax/",include("ajax.urls")), #route starts with ajax/ than call from ajax application
-    path("auth/",include("users.urls")),
+    path("account/",include("users.urls")),
     path("post/", include("post.urls")),
 
 ]
