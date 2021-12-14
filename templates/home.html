@@ -10,9 +10,14 @@
 Number of votes: {{ post.votes }}
 <h2>Post</h2>
 <h3>{{ post.post.text }}</h3>
+<a href="/post/view/{{ post.post.post_id }}">Read</a>
 <form action="/ajax/vote_post/{{post.post.post_id}}" method="post">
   {% csrf_token %}
   <input type="submit" class="btn btn-secondary" value="Vote">
+</form>
+<form action="/ajax/save/{{post.post.post_id}}" method="post">
+  {% csrf_token %}
+  <input type="submit" class="btn btn-primary" value="Save">
 </form>
 <form action="/ajax/report_post/{{post.post.post_id}}" method="post">
   {% csrf_token %}
@@ -23,8 +28,5 @@ Number of votes: {{ post.votes }}
 {% endfor %}
 {% endfor %}
 {% load static %}
-<script>
-  document.title = "Feed - {{ user }}"
-</script>
 <script src="{% static 'js/home.js' %}"></script>
 {% endblock %}

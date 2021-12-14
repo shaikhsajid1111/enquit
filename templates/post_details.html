@@ -1,24 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
+{% extends "base_layout.html" %}
+
+{% block content %}
   {{post_data.author.user.username}}
   {{ post_data.posted_on }}
   <h2>{{ post_data.text }}</h2>
 
 
-  Answers:
+<form action="post_comment/{{ post_data.post_id }}" method="post">
+  {% csrf_token %}
+  <input type="text" name="text" placeholder="Write Answer">
+  <input type="hidden" name="sno" value="{{post_data.post_id}}">
+  <input type="submit" value="Post Answer">
+</form>
 
-  <form action="post_comment/{{ post_data.post_id }}" method="post">
-    {% csrf_token %}
-    <input type="text" name="text">
-    <input type="hidden" name="sno" value="{{post_data.post_id}}">
-    <input type="submit" value="Post">
-  </form>
-</body>
-</html>
+  Answers:
+  <br>
+  {% for answer in answers %}
+  <hr>
+  {{ answer.answer.text }}
+   <a href="/post/delete_answer/{{ answer.answer.id }}" class="text-danger">Delete</a>
+   <form action="/ajax/vote_answer/{{ answer.answer.id }}" method="post">
+     {% csrf_token %}
+    <input type="submit" class="btn btn-secondary" value="Vote">
+   </form>
+   <form action="post_comment/{{ post_data.post_id }}" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="parentSno" value="{{ answer.answer.id }}">
+      <input type="text" name="text" placeholder="Reply to {{ answer.answer.user.user }}">
+      <input type="submit" value="Post reply">
+    </form>
+    {% for reply in answer.replies %}
+    Reply : {{ reply.text }}
+    <a href="/post/delete_answer/{{ reply.id }}">Delete</a>
+    <form action="/ajax/vote_answer/{{ reply.id }}" method="post">
+      {% csrf_token %}
+      <input type="submit" class="btn btn-secondary" value="Vote">
+    </form>
+    <br>
+    {% endfor %}
+    <hr>
+  <br>
+  {% endfor %}
+{% endblock %}
