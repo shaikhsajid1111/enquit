@@ -10,40 +10,51 @@ class Post(models.Model):
         CustomUser, on_delete=models.CASCADE, null=False)
     text = models.TextField(default="")
     posted_on = models.DateTimeField(default=now, editable=False)
+
     class Meta:
-      ordering = ['-posted_on']
+        ordering = ['-posted_on']
+
 
 class Images(models.Model):
     public_id = models.TextField(default="")
     url = models.TextField(default="")
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True,  related_name="urls")
+    post = models.ForeignKey(
+        Post, on_delete=models.CASCADE, null=True,  related_name="urls")
 
 
 class Vote(models.Model):
-  user = models.ForeignKey(
+    user = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, null=False)
-  post = models.ForeignKey(Post, on_delete=models.CASCADE,
-                           null=True,  related_name="vote")
-  created = models.DateTimeField(default=now, editable=False)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE,
+                             null=True,  related_name="vote")
+    created = models.DateTimeField(default=now, editable=False)
+
 
 class Report(models.Model):
-  user = models.ForeignKey(
+    user = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, null=False)
-  post = models.ForeignKey(Post, on_delete=models.CASCADE,
-                           null=True,  related_name="report")
-  created = models.DateTimeField(default=now, editable=False)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE,
+                             null=True,  related_name="report")
+    created = models.DateTimeField(default=now, editable=False)
 
 
-
-"""
 class Answer(models.Model):
-  post = models.ForeignKey(
-        Post, on_delete=models.CASCADE, related_name="answer")
-  author = models.ForeignKey(CustomUser,on_delete=models.CASCADE,related_name='author')
-  text = models.TextField()
-  date_created = models.DateTimeField(default=now,editable=False)
-  parent = models.ForeignKey("self",null=True,blank=True,related_name="replies",on_delete=models.CASCADE)
+    text = models.TextField()
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
+    timestamp = models.DateTimeField(default=now)
 
-  def __str__(self):
-    return self.text
-"""
+
+class Answer_Vote(models.Model):
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, null=False)
+    answer = models.ForeignKey(Answer, on_delete=models.CASCADE,
+                               null=True,  related_name="answer_vote")
+    created = models.DateTimeField(default=now, editable=False)
+
+
+class Vault(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    created_on = models.DateTimeField(default=now, editable=False)
