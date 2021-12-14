@@ -14,8 +14,8 @@ from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_text
 from django.utils.encoding import force_text
-import environ
-from post.models import Post,Images
+import environ  # external library
+from post.models import Post, Images
 import cloudinary.uploader
 # To read environment variable
 env = environ.Env()
@@ -27,7 +27,7 @@ def login_user(request):
         # check if the user is already authenticated user
         if request.user.is_authenticated and not request.user.is_superuser:
             # if the user is authenticated, the redirect them to home page again
-            return redirect("/home")
+            return redirect("/")
         # if the user is unauthenticated then redirect to login page
         return render(request, "login.html")  # rendering the login.html
     if request.method == "POST":  # check if the request we got is HTTP POST request
@@ -39,13 +39,13 @@ def login_user(request):
         user = authenticate(username=username, password=password)
         if user is not None:  # if user matched the given credentials
             login(request, user)  # login the user
-            return redirect("/home")  # send them to home page
+            return redirect("/")  # send them to home page
         else:
             # if no user with such credentials was found
             # set the error message
             messages.error(request, "Invalid Credentials!")
             # redirect user back to login page again
-            return redirect("/auth/login")
+            return redirect("/account/login")
 
 
 @login_required
@@ -53,7 +53,7 @@ def log_out(request):
     if request.user.is_authenticated:
         # if the user is authenticated
         logout(request)  # log out the user
-        return redirect("/auth/login")  # redirect them back to login page
+        return redirect("/account/login")  # redirect them back to login page
 
 
 @login_required
@@ -73,20 +73,21 @@ def delete_user(request):
             custom_user = CustomUser.objects.get(user=user)
             users_posts = Post.objects.filter(author=custom_user)
             for post in users_posts:
-              images = Images.objects.filter(post=post)
-              for image in images:
-                cloudinary.uploader.destroy(image.public_id)
-              post.delete()
+                images = Images.objects.filter(post=post)
+                for image in images:
+                    cloudinary.uploader.destroy(image.public_id)
+                post.delete()
             custom_user.delete()  # delete the user from the database
             user.delete()
             # just a message to express sad that user is leaving the site
             messages.info(request, "Its sad to let you go :(")
-            return redirect("/auth/login")  # redirect them back to login
+            return redirect("/account/login")  # redirect them back to login
         else:
             # if the credentials are incorrect
             messages.error(
                 request, "Invalid credentials!, Can't delete the account")
-            return redirect("/auth/delete")  # send them back to the same page
+            # send them back to the same page
+            return redirect("/account/delete")
 
 
 def signUp(request):
@@ -94,7 +95,7 @@ def signUp(request):
     if request.method == "GET":
         if request.user.is_authenticated and not request.user.is_superuser:
             # if the user is authnticated and is not the admin
-            return redirect("/home")  # send them to home
+            return redirect("/")  # send them to home
         # if any conditiona dissatisfies, then send to signup form
         return render(request, "signup.html")
     elif request.method == "POST":  # if the form have been submitted
@@ -136,25 +137,27 @@ def signUp(request):
                     current_site = get_current_site(request)
                     # convert the HTML file into string that will be sent via Email
                     message = render_to_string("email_template.html", {
-                        "user": user, #denotes the current user
-                        "domain": current_site.domain, #denotes the current website's domain
-                        "uid": urlsafe_base64_encode(force_bytes(user.pk)), #UID that needs to be checked
+                        "user": user,  # denotes the current user
+                        "domain": current_site.domain,  # denotes the current website's domain
+                        # UID that needs to be checked
+                        "uid": urlsafe_base64_encode(force_bytes(user.pk)),
                         "token": account_activation_token.make_token(user)
                     })
-                    to_email = email #the email receipent host
-                    send_mail(mail_subject, message, env('EMAIL_HOST'), [to_email]) #send the mail to the user
+                    to_email = email  # the email receipent host
+                    send_mail(mail_subject, message, env('EMAIL_HOST'), [
+                              to_email])  # send the mail to the user
                     login(request, user)  # login the new user
-                    return redirect("/home")  # send them to home page
+                    return redirect("/")  # send them to home page
             else:
                 messages.warning(
                     request, "Passwords Must be more then 5 characters!")
                 # send them back to signup page
-                return render(request, "signup.html")
+                return render(request, "signup.html", {"title": "Sign Up With Us"})
         else:
             # if the passwords do not match
             messages.warning(request, "Passwords do not match")
             # send them back to signup page
-            return render(request, "signup.html")
+            return render(request, "signup.html", {"title": "Sign Up With Us"})
 
 
 def activate(request, uid64, token):
@@ -164,11 +167,14 @@ def activate(request, uid64, token):
     """
     User = get_user_model()
     try:
-        uid = force_text(urlsafe_base64_decode(uid64)) #convert the UID passed to text
-        user = CustomUser.objects.get(user=request.user) #get the CustomUser who clicked the the link
-        related_user = User.objects.get(pk=uid) #get the related user with the UID
+        # convert the UID passed to text
+        uid = force_text(urlsafe_base64_decode(uid64))
+        # get the CustomUser who clicked the the link
+        user = CustomUser.objects.get(user=request.user)
+        # get the related user with the UID
+        related_user = User.objects.get(pk=uid)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        #if the user was not found
+        # if the user was not found
         user = None
     if user is not None and account_activation_token.check_token(related_user, token):
         if user.is_verified is True:
@@ -177,5 +183,13 @@ def activate(request, uid64, token):
         user.save()
         return HttpResponse("Thank you for registration, Have a great time posting! :)")
     else:
-        #on invalid link throw this error
-        return HttpResponse("Activation Link is Invalid!")
+        # on invalid link throw this error
+        return HttpResponse("We Apologize but your activation Link is Invalid!")
+
+
+def view_user(request, username):
+    user = User.objects.get(username=username)
+    custom_user = CustomUser.objects.get(user=user)
+    posts = Post.objects.filter(author=custom_user)[:10]
+    # send the data to home page as well
+    return render(request, "home.html", {"user_data": custom_user, "posts_data": (posts), "title": "Feed - {}".format(username)})
