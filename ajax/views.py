@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from users.models import CustomUser
-from post.models import Post, ReportOfAnswer, Vote, Report, Images, Answer_Vote, Answer, Vault
+from post.models import Post, ReportOfAnswer, Tags, Vote, Report, Images, Answer_Vote, Answer, Vault
 from django.contrib.auth.decorators import login_required
 import cloudinary  # external library
 import cloudinary.uploader  # external library
@@ -14,14 +14,14 @@ def vote_post(request, post_id):
     POST http://domain.com/vote_post/<post_id>
     where page_id is integer
     """
-    #if it is POST method
+    # if it is POST method
     if request.method == "POST":
-        user = CustomUser.objects.get(user=request.user) #fetch the user
-        post = Post.objects.get(post_id=post_id) #fetch the post
+        user = CustomUser.objects.get(user=request.user)  # fetch the user
+        post = Post.objects.get(post_id=post_id)  # fetch the post
         try:
             # if vote is already done then un-vote by deleting the response
             vote = Vote.objects.get(user=user, post=post)
-            vote.delete() #delete the vote
+            vote.delete()  # delete the vote
             return JsonResponse({"status": 200, "message": "Un-voted the post!"})
         except Vote.DoesNotExist:
             # if vote is not done then vote by creating and saving the response
@@ -29,7 +29,8 @@ def vote_post(request, post_id):
             new_vote.save()
             return JsonResponse({"status": 200, "message": "Voted the post!"})
     else:
-      return JsonResponse({"status": 405, "message": "Method Not Allowed"})
+        return JsonResponse({"status": 405, "message": "Method Not Allowed"})
+
 
 @login_required
 def vote_answer(request, answer_id):
@@ -55,7 +56,8 @@ def vote_answer(request, answer_id):
             new_vote.save()
             return JsonResponse({"status": 200, "message": "Voted the answer!"})
     else:
-      return JsonResponse({"status": 405, "message": "Method Not Allowed"})
+        return JsonResponse({"status": 405, "message": "Method Not Allowed"})
+
 
 @login_required
 def report_post(request, post_id):
@@ -82,9 +84,9 @@ def report_post(request, post_id):
             post.delete()
         return JsonResponse({"status": 200, "message": "Reported!"})
     else:
-      return JsonResponse({"status": 405, "message": "Method Not Allowed"})
+        return JsonResponse({"status": 405, "message": "Method Not Allowed"})
 
-      
+
 @login_required
 def report_answer(request, answer_id):
     """view to report the post using HTTP request.
@@ -106,7 +108,8 @@ def report_answer(request, answer_id):
             answer.delete()
         return JsonResponse({"status": 200, "message": "Reported!"})
     else:
-      return JsonResponse({"status":405,"message":"Method Not Allowed"})
+        return JsonResponse({"status": 405, "message": "Method Not Allowed"})
+
 
 @login_required
 def delete_answer(request, answer_id):
@@ -115,19 +118,23 @@ def delete_answer(request, answer_id):
     answer_id is integer
     """
     if request.method == "GET":
-        user = request.user #fetch the user
-        custom_user = CustomUser.objects.get(user=user) #fetch the custom user
+        user = request.user  # fetch the user
+        custom_user = CustomUser.objects.get(
+            user=user)  # fetch the custom user
         try:
-            answer = Answer.objects.get(id=answer_id) #find the answer by its id
+            # find the answer by its id
+            answer = Answer.objects.get(id=answer_id)
         except:
-            answer = None #if answer is not found than set it to None
-        if answer is not None and answer.user == custom_user: #if the answer is not None and the user is the answer owner
+            answer = None  # if answer is not found than set it to None
+        # if the answer is not None and the user is the answer owner
+        if answer is not None and answer.user == custom_user:
             answer.delete()
             return JsonResponse({"status": 200, "message": "Deleted Successfully!"})
         else:
             return JsonResponse({"status": 403, "message": "Invalid Access!"})
     else:
-      return JsonResponse({"status": 405, "message": "Method Not Allowed"})
+        return JsonResponse({"status": 405, "message": "Method Not Allowed"})
+
 
 @login_required
 def save_answer(request, post_id):
@@ -148,7 +155,8 @@ def save_answer(request, post_id):
             item.save()
             return JsonResponse({"status": 200, "message": "Saved the answer!"})
     else:
-      return JsonResponse({"status":405,"message":"Method Not Allowed"})
+        return JsonResponse({"status": 405, "message": "Method Not Allowed"})
+
 
 @login_required
 def fetch_posts(request, page_number):
@@ -189,7 +197,11 @@ def fetch_posts(request, page_number):
                     images = [image.url for image in images]
                 except Images.DoesNotExist:
                     images = []
-
+                try:
+                    tags = Tags.objects.filter(tag=post)
+                    tags = [tag.text for tag in tags]
+                except Tags.DoesNotExist:
+                    tags = []
                 post_data_temp = {
                     # parse the post's data
                     "post_id": post.post_id,
@@ -208,6 +220,7 @@ def fetch_posts(request, page_number):
                 data['images'] = images
                 data['is_saved'] = is_saved
                 data['already_voted'] = already_voted
+                data['tags'] = tags
                 posts_data.append(data)
                 # print(posts_data)
                 # send the data to home page as well
@@ -216,7 +229,8 @@ def fetch_posts(request, page_number):
             print(ex)
             return JsonResponse({"status": 400, "posts_data": []})
     else:
-      return JsonResponse({"status":405,"message":"Method Not Allowed"})
+        return JsonResponse({"status": 405, "message": "Method Not Allowed"})
+
 
 @login_required
 def fetch_user_posts(request, username, page_number):
@@ -271,12 +285,17 @@ def fetch_user_posts(request, username, page_number):
                     "profile_image": post.author.profile_picture_link,
                     "is_verified": post.author.is_verified
                 }
-
+                try:
+                    tags = Tags.objects.filter(tag=post)
+                    tags = [tag.text for tag in tags]
+                except Tags.DoesNotExist:
+                    tags = []
                 data['author'] = author_temp_data
                 data['post'] = post_data_temp
                 data['images'] = list(images)
                 data['is_saved'] = is_saved
                 data['already_voted'] = already_voted
+                data['tags'] = tags
                 posts_data.append(data)
 
               # send the data to home page as well
@@ -285,7 +304,8 @@ def fetch_user_posts(request, username, page_number):
             print("Error: ", ex)
             return JsonResponse({"status": 400, "posts_data": []})
     else:
-      return JsonResponse({"status":405,"message":"Method Not Allowed"})
+        return JsonResponse({"status": 405, "message": "Method Not Allowed"})
+
 
 @login_required
 def fetch_answers(request, post_id, page_number):
@@ -344,11 +364,17 @@ def fetch_answers(request, post_id, page_number):
                     "profile_image": answer.user.profile_picture_link,
                     "is_verified": answer.user.is_verified
                 }
+                try:
+                    tags = Tags.objects.filter(tag=post)
+                    tags = [tag.text for tag in tags]
+                except Tags.DoesNotExist:
+                    tags = []
                 # assign the data with respective keys
                 data['author'] = author_temp_data
                 data['answer'] = answer_data_temp
                 data['answer']['replies'] = replies_list
                 data['already_voted'] = already_voted
+                data['tags'] = tags
                 posts_data.append(data)
                 # print(posts_data)
                 # send the data to home page as well
@@ -357,7 +383,8 @@ def fetch_answers(request, post_id, page_number):
             print(ex)
             return JsonResponse({"status": 400, "answers": []})
     else:
-      return JsonResponse({"status": 405, "message": "Method Not Allowed"})
+        return JsonResponse({"status": 405, "message": "Method Not Allowed"})
+
 
 @login_required
 def fetch_saved_posts(request, page_number):
@@ -408,11 +435,17 @@ def fetch_saved_posts(request, page_number):
                     "profile_image": vault_item.post.author.profile_picture_link,
                     "is_verified": vault_item.post.author.is_verified
                 }
+                try:
+                    tags = Tags.objects.filter(tag=vault_item)
+                    tags = [tag.text for tag in tags]
+                except Tags.DoesNotExist:
+                    tags = []
                 data['author'] = author_temp_data
                 data['post'] = post_data_temp
                 data['images'] = list(images)
                 data['is_saved'] = is_saved
                 data['already_voted'] = already_voted
+                data['tags'] = tags
                 posts_data.append(data)
                 # print(posts_data)
                 # send the data to home page as well
@@ -421,4 +454,147 @@ def fetch_saved_posts(request, page_number):
             print(ex)
             return JsonResponse({"status": 400, "posts_data": []})
     else:
-      return JsonResponse({"status":405,"message":"Method Not Allowed"})
+        return JsonResponse({"status": 405, "message": "Method Not Allowed"})
+
+
+@login_required
+def fetch_posts_by_tag(request, tag, page_number):
+    """
+    view to get the user's saved posts using HTTP request.
+
+    GET http://domain.com/fetch_by_tags/<tag>/<page_number>
+    page_number is integer
+    """
+    if request.method == "GET":
+        try:
+            offset = (int(page_number)*10)-10
+            limits = int(page_number)*10
+            custom_user = CustomUser.objects.get(user=request.user)
+            try:
+                tags = Tags.objects.filter(text=tag)[offset:limits]
+                posts = [tag.tag for tag in tags]
+            except Vault.DoesNotExist:
+                return JsonResponse({"status": 403, "posts_data": []})
+            posts_data = []
+            for post in posts:
+                data = {}
+                already_voted = Vote.objects.filter(
+                    user=custom_user, post=post) and True or False
+                try:
+                    votes = Vote.objects.filter(post=post).count()
+                except Vote.DoesNotExist:
+                    votes = 0
+                data['votes'] = votes
+                try:
+                    is_saved = Vault.objects.get(
+                        post=post, user=custom_user)
+                    is_saved = True
+                except Vault.DoesNotExist:
+                    is_saved = False
+                try:
+                    images = Images.objects.filter(post=post)
+                    images = [image.url for image in images]
+                except Images.DoesNotExist:
+                    images = []
+
+                post_data_temp = {
+                    "post_id": post.post_id,
+                    "text": post.text,
+                    "posted_on": post.posted_on,
+                }
+                author_temp_data = {
+                    "user_id": post.author.id,
+                    "username": post.author.user.username,
+                    "profile_image": post.author.profile_picture_link,
+                    "is_verified": post.author.is_verified
+                }
+                try:
+                    tags = Tags.objects.filter(tag=post)
+                    tags = [tag.text for tag in tags]
+                except Tags.DoesNotExist:
+                    tags = []
+                data['author'] = author_temp_data
+                data['post'] = post_data_temp
+                data['images'] = list(images)
+                data['is_saved'] = is_saved
+                data['already_voted'] = already_voted
+                data['tags'] = tags
+                posts_data.append(data)
+                # print(posts_data)
+                # send the data to home page as well
+            return JsonResponse({"status": 200, "posts_data": posts_data})
+        except Exception as ex:
+            print(ex)
+            return JsonResponse({"status": 400, "posts_data": []})
+    else:
+        return JsonResponse({"status": 405, "message": "Method Not Allowed"})
+
+
+def fetch_search_result(request, query, page_number):
+    if request.method == "GET":
+        # if query is not empty
+        if query != "":
+            offset = (int(page_number)*10)-10
+            limits = int(page_number)*10
+            current_custom_user = CustomUser.objects.get(user=request.user)
+            if query.startswith("@"):
+                # if query starts with @ then it means we need to find user
+                users_data_db = CustomUser.objects.filter(
+                    user__username__contains=str(query).removeprefix("@"))[offset:limits]
+                users_data = []
+                for user in users_data_db:
+                    data = {
+                        "user_id": user.id,
+                        "username": user.user.username,
+                        "profile_image": user.profile_picture_link,
+                        "is_verified": user.is_verified
+                    }
+                    users_data.append(data)
+                return JsonResponse({"status": 200, "data": users_data, "type": "user"})
+            else:
+              # if the query starts with text then it means we need to find from the text
+                posts = Post.objects.filter(
+                    text__contains=str(query))[offset:limits]
+                posts_data = []
+                for post in posts:
+                    data = {}
+                    already_voted = Vote.objects.filter(
+                        user=current_custom_user, post=post) and True or False
+                    try:
+                        votes = Vote.objects.filter(post=post).count()
+                    except Vote.DoesNotExist:
+                        votes = 0
+                    data['votes'] = votes
+                    try:
+                        is_saved = Vault.objects.get(
+                            post=post, user=current_custom_user)
+                        is_saved = True
+                    except Vault.DoesNotExist:
+                        is_saved = False
+                    try:
+                        images = Images.objects.filter(post=post)
+                        images = [image.url for image in images]
+                    except Images.DoesNotExist:
+                        images = []
+
+                    post_data_temp = {
+                        "post_id": post.post_id,
+                        "text": post.text,
+                        "posted_on": post.posted_on,
+                    }
+                    author_temp_data = {
+                        "user_id": post.author.id,
+                        "username": post.author.user.username,
+                        "profile_image": post.author.profile_picture_link,
+                        "is_verified": post.author.is_verified
+                    }
+
+                    data['author'] = author_temp_data
+                    data['post'] = post_data_temp
+                    data['images'] = list(images)
+                    data['is_saved'] = is_saved
+                    data['already_voted'] = already_voted
+                    posts_data.append(data)
+                return JsonResponse({"status": 200, "data": posts_data, "type": "post"})
+        else:
+            return JsonResponse({"status": 405, "message": "Method Not Allowed"})

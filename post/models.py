@@ -66,3 +66,7 @@ class Vault(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_on = models.DateTimeField(default=now, editable=False)
+
+class Tags(models.Model):
+  text = models.CharField(max_length=200,default="")
+  tag = models.ForeignKey(Post,on_delete=models.CASCADE)
