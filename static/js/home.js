@@ -1,0 +1,3 @@
+const vote_post = () => {
+
+}
