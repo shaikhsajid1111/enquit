@@ -46,6 +46,14 @@ class Answer(models.Model):
     timestamp = models.DateTimeField(default=now)
 
 
+class ReportOfAnswer(models.Model):
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, null=False)
+    answer = models.ForeignKey(Answer, on_delete=models.CASCADE,
+                              null=True,  related_name="answer_report")
+    created = models.DateTimeField(default=now, editable=False)
+
+
 class Answer_Vote(models.Model):
     user = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, null=False)
