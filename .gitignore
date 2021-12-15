@@ -4,3 +4,4 @@ ajax/migrations
 /users/migrations
 /*/*.env
 *.env
+post/migrations

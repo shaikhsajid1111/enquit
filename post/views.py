@@ -117,4 +117,4 @@ def view_saved(request):
         user = request.user
         custom_user = CustomUser.objects.get(user=user)
         saved_posts = Vault.objects.filter(user=custom_user)
-        print(saved_posts)
+        return render(request,"home.html",{"posts_data":saved_posts,"user_data":custom_user})
