@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from users.models import CustomUser
-from .models import Post, Images, Answer, Vault
+from .models import Post, Images, Answer, Vault, Tags, Vote
 import cloudinary  # external library
 import cloudinary.uploader  # external library
 
@@ -14,7 +14,7 @@ def create_post(request):
     if request.method == "POST":
         text = request.POST['text']
         images = request.FILES.getlist('images')
-
+        tags = request.POST['tags']
         user = CustomUser.objects.get(user=request.user)
         post = Post(text=text, author=user)
         post.save()
@@ -25,6 +25,10 @@ def create_post(request):
                 image_obj = Images.objects.create(
                     url=result["url"], public_id=result['public_id'], post=post)
         post.save()
+        for tag in tags.split(" "):
+            tag_obj = Tags.objects.create(text=tag, tag=post)
+            tag_obj.save()
+
         messages.success(request, "Post Created Successfully!")
         return redirect("/")
 
@@ -117,4 +121,38 @@ def view_saved(request):
         user = request.user
         custom_user = CustomUser.objects.get(user=user)
         saved_posts = Vault.objects.filter(user=custom_user)
-        return render(request,"home.html",{"posts_data":saved_posts,"user_data":custom_user})
+        return render(request, "home.html", {"posts_data": saved_posts, "user_data": custom_user})
+
+
+@login_required
+def view_by_tag(request, tag):
+    if request.method == "GET":
+        tags = Tags.objects.filter(text=tag)
+        posts = [tag.tag for tag in tags]
+        posts_data = []
+        user_data = CustomUser.objects.get(
+            user=request.user)  # fetch the user from database
+        for post in posts:
+            data = {}
+            already_voted = Vote.objects.filter(
+                user=user_data, post=post) and True or False
+            try:
+                votes = Vote.objects.filter(post=post).count()
+            except Vote.DoesNotExist:
+                votes = 0
+            data['votes'] = votes
+            try:
+                images = Images.objects.filter(post=post)
+            except Images.DoesNotExist:
+                images = []
+            try:
+              tags = Tags.objects.filter(tag=post)
+              tags = [tagg.text for tagg in tags]
+            except Tags.DoesNotExist:
+              tags = []
+            data['images'] = images
+            data['post'] = post
+            data['already_voted'] = already_voted
+            posts_data.append(data)
+            # send the data to home page as well
+            return render(request, "home.html", {"user_data": user_data, "posts_data": (posts_data), "title": "Website Name - {}".format(tag)})

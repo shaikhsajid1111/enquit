@@ -1,4 +1,7 @@
+from os import name
 from django.urls import path
+
+from ajax.views import delete_answer
 from . import views
 from django.contrib.auth import views as auth_views
 
@@ -9,5 +12,6 @@ urlpatterns = [
     path("view/<post_id>", views.view_post, name="view_post"),
     path("view/post_comment/<post_id>", views.post_answer, name="post_comment"),
 
-    path("delete_answer/<answer_id>", views.delete_answer, name="delete_answer")
+    path("delete_answer/<answer_id>", views.delete_answer, name="delete_answer"),
+    path("tag/<tag>",views.view_by_tag,name="tag_view")
 ]

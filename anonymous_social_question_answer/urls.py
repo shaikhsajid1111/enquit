@@ -17,12 +17,14 @@ from django.contrib import admin
 from django.urls import path,include
 from . import views
 
+admin.site.site_header = "<app_name> Administration"
+
 urlpatterns = [
     path("",views.home,name="home"),
     path('admin/', admin.site.urls),
-    path("search/", views.search, name="search"),
+    path("search/<page_number>", views.search, name="search"),
     path("ajax/",include("ajax.urls")), #route starts with ajax/ than call from ajax application
-    path("account/",include("users.urls")),
-    path("post/", include("post.urls")),
+    path("account/",include("users.urls")), #route starts with account/ than call from users application
+    path("post/", include("post.urls")), #route starts with post/ than call from post application
 
 ]
