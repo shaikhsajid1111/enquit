@@ -4,9 +4,14 @@ from . import views
 
 # all ajax routes are registered here
 urlpatterns = [
-    path("fetch_posts", views.fetch_posts),
+    path("fetch_posts/<page_number>", views.fetch_posts),
     path("vote_post/<post_id>", views.vote_post),
     path("report_post/<post_id>", views.report_post),
     path("vote_answer/<answer_id>", views.vote_answer),
-    path("save/<post_id>", views.save_answer)
+    path("save/<post_id>", views.save_answer),
+    path("fetch_user_posts/<username>/<page_number>", views.fetch_user_posts),
+    path("delete_answer/<answer_id>", views.delete_answer),
+    path("fetch_post_answers/<post_id>/<page_number>", views.fetch_answers),
+    path("fetch_saved_posts/<page_number>", views.fetch_saved_posts),
+    path("report_answer/<answer_id>", views.report_answer)
 ]
