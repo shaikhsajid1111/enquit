@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from users.models import CustomUser
+from users.models import CustomUser, ReportAccount
 from post.models import Post, ReportOfAnswer, Tags, Vote, Report, Images, Answer_Vote, Answer, Vault
 from django.contrib.auth.decorators import login_required
 import cloudinary  # external library
@@ -106,6 +106,28 @@ def report_answer(request, answer_id):
         # if 2% of total users on the site reports than the post's should be deleted automatically
         if report_counts > (2/100)*number_of_users:
             answer.delete()
+        return JsonResponse({"status": 200, "message": "Reported!"})
+    else:
+        return JsonResponse({"status": 405, "message": "Method Not Allowed"})
+
+@login_required
+def report_account(request, account_id):
+    """view to report the post using HTTP request.
+
+    POST http://domain.com/report_account/<account_id>
+    where account_id is integer
+    """
+    if request.method == "POST":
+        user = CustomUser.objects.get(user=request.user)
+        account_to_report = CustomUser.objects.get(id=account_id)
+        new_report, created = ReportAccount.objects.get_or_create(user=user,report=account_to_report)
+        report_counts = ReportAccount.objects.filter(
+            report=account_to_report).count()  # number of reports
+        number_of_users = CustomUser.objects.all().count()  # number of total users
+        print("Percentage: ", (2/100)*number_of_users)
+        # if 15% of total users on the site reports than the post's should be deleted automatically
+        if report_counts > (15/100)*number_of_users:
+            account_to_report.delete()
         return JsonResponse({"status": 200, "message": "Reported!"})
     else:
         return JsonResponse({"status": 405, "message": "Method Not Allowed"})

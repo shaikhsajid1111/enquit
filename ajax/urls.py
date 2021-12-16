@@ -15,6 +15,7 @@ urlpatterns = [
     path("fetch_saved_posts/<page_number>", views.fetch_saved_posts),
     path("report_answer/<answer_id>", views.report_answer),
     path("fetch_search_result/<query>/<page_number>",views.fetch_search_result),
-    path("fetch_by_tag/<tag>/<page_number>", views.fetch_posts_by_tag)
+    path("fetch_by_tag/<tag>/<page_number>", views.fetch_posts_by_tag),
+    path("report_account/<account_id>", views.report_account),
 
 ]
