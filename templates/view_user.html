@@ -11,15 +11,15 @@ Number of votes: {{ post.votes }}
 <h2>Post</h2>
 <h3>{{ post.post.text }}</h3>
 <a href="/post/view/{{ post.post.post_id }}">Read</a>
-<form action="/ajax/vote_post/{{post.post.post_id}}" method="post">
+<form action="/api/vote_post/{{post.post.post_id}}" method="post">
   {% csrf_token %}
   <input type="submit" class="btn btn-secondary" value="Vote">
 </form>
-<form action="/ajax/save/{{post.post.post_id}}" method="post">
+<form action="/api/save/{{post.post.post_id}}" method="post">
   {% csrf_token %}
   <input type="submit" class="btn btn-primary" value="Save">
 </form>
-<form action="/ajax/report_post/{{post.post.post_id}}" method="post">
+<form action="/api/report_post/{{post.post.post_id}}" method="post">
   {% csrf_token %}
   <input type="submit" class="btn btn-danger" value="Report">
 </form>

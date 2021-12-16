@@ -19,7 +19,7 @@
   <hr>
   {{ answer.answer.text }}
    <a href="/post/delete_answer/{{ answer.answer.id }}" class="text-danger">Delete</a>
-   <form action="/ajax/vote_answer/{{ answer.answer.id }}" method="post">
+   <form action="/api/vote_answer/{{ answer.answer.id }}" method="post">
      {% csrf_token %}
     <input type="submit" class="btn btn-secondary" value="Vote">
    </form>
@@ -29,7 +29,7 @@
       <input type="text" name="text" placeholder="Reply to {{ answer.answer.user.user }}">
       <input type="submit" value="Post reply">
     </form>
-        <form action="/ajax/report_answer/{{ answer.answer.id }}" method="post">
+        <form action="/api/report_answer/{{ answer.answer.id }}" method="post">
           {% csrf_token %}
           <input type="submit" class="btn btn-danger" value="Report">
         </form>
@@ -37,12 +37,12 @@
     {% for reply in answer.replies %}
     Reply : {{ reply.text }}
     <a href="/post/delete_answer/{{ reply.id }}">Delete</a>
-    <form action="/ajax/vote_answer/{{ reply.id }}" method="post">
+    <form action="/api/vote_answer/{{ reply.id }}" method="post">
       {% csrf_token %}
       <input type="submit" class="btn btn-secondary" value="Vote">
     </form>
 
-    <form action="/ajax/report_answer/{{ reply.id }}" method="post">
+    <form action="/api/report_answer/{{ reply.id }}" method="post">
       {% csrf_token %}
       <input type="submit" class="btn btn-danger" value="Report">
     </form>

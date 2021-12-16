@@ -23,7 +23,7 @@ urlpatterns = [
     path("",views.home,name="home"),
     path('admin/', admin.site.urls),
     path("search/<page_number>", views.search, name="search"),
-    path("ajax/",include("ajax.urls")), #route starts with ajax/ than call from ajax application
+    path("api/",include("api.urls")), #route starts with ajax/ than call from ajax application
     path("account/",include("users.urls")), #route starts with account/ than call from users application
     path("post/", include("post.urls")), #route starts with post/ than call from post application
 
