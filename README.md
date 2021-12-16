@@ -18,3 +18,18 @@
 <li>Run command <code>python manage.py runserver</code> and open http://localhost:8000 on your machine's browser.</li>
 <li>(Optional) If you want to create your admin account to manage the site. Run command <code>python manage.py createsuperuser</code> and enter all valid credentials it asks you to enter. Then visit http://localhost:8000/admin from your browser it will take you yo admin panel.</li>
 </ol>
+
+API Endpoints availble:
+<li><code>/api/fetch_posts/page_number(integer)</code></li>
+<li><code>/api/vote_post/post_id(integer)</code></li>
+<li> <code>/api/report_post/post_id(integer)</code></li>
+<li><code>/api/vote_answer/answer_id(integer) </code></li>
+<li><code>/api/save/post_id(integer)</code></li>
+<li><code>/api/fetch_user_posts/username(string)/page_number(integer)</code></li>
+<li><code>/api/delete_answer/answer_id(integer)</code></li>
+<li><code>/api/fetch_post_answers/post_id(integer)/page_number(integer)</code></li>
+<li><code>/api/fetch_saved_posts/page_number(integer)</code></li>
+<li><code>/api/report_answer/answer_id(integer)</code></li>
+<li><code>/api/fetch_search_result/query(string)/page_number(integer)</code></li>
+<li><code>/api/fetch_by_tag/tag(string)/page_number(integer)</code></li>
+<li><code>/api/report_account/account_id(integer)</code></li>
