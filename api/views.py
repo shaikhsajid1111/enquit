@@ -15,7 +15,7 @@ def vote_post(request, post_id):
     where page_id is integer
     """
     # if it is POST method
-    if request.method == "POST":
+    if request.method == "GET":
         user = CustomUser.objects.get(user=request.user)  # fetch the user
         post = Post.objects.get(post_id=post_id)  # fetch the post
         try:
@@ -39,7 +39,7 @@ def vote_answer(request, answer_id):
     POST http://domain.com/vote_post/<answer_id>
     where answer_id is integer
     """
-    if request.method == "POST":
+    if request.method == "GET":
         user = CustomUser.objects.get(user=request.user)
         answer = Answer.objects.get(id=answer_id)
         try:
@@ -66,7 +66,7 @@ def report_post(request, post_id):
     POST http://domain.com/report_post/<post_id>
     where post_id is integer
     """
-    if request.method == "POST":
+    if request.method == "GET":
 
         user = CustomUser.objects.get(user=request.user)
         post = Post.objects.get(post_id=post_id)
@@ -94,7 +94,7 @@ def report_answer(request, answer_id):
     POST http://domain.com/report_answer/<answer_id>
     where post_id is integer
     """
-    if request.method == "POST":
+    if request.method == "GET":
         user = CustomUser.objects.get(user=request.user)
         answer = Answer.objects.get(id=answer_id)
         new_report, created = ReportOfAnswer.objects.get_or_create(
@@ -117,7 +117,7 @@ def report_account(request, account_id):
     POST http://domain.com/report_account/<account_id>
     where account_id is integer
     """
-    if request.method == "POST":
+    if request.method == "GET":
         user = CustomUser.objects.get(user=request.user)
         account_to_report = CustomUser.objects.get(id=account_id)
         new_report, created = ReportAccount.objects.get_or_create(user=user,report=account_to_report)
@@ -165,7 +165,7 @@ def save_answer(request, post_id):
     POST http://domain.com/save_answer/<post_id>
     where post_id is integer
     """
-    if request.method == "POST":
+    if request.method == "GET":
         user = CustomUser.objects.get(user=request.user)
         post = Post.objects.get(post_id=post_id)
         try:
