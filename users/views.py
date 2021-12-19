@@ -15,7 +15,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_text
 from django.utils.encoding import force_text
 import environ  # external library
-from post.models import Post, Images
+from post.models import Post, Medias
 import cloudinary.uploader
 # To read environment variable
 env = environ.Env()
@@ -73,7 +73,7 @@ def delete_user(request):
             custom_user = CustomUser.objects.get(user=user)
             users_posts = Post.objects.filter(author=custom_user)
             for post in users_posts:
-                images = Images.objects.filter(post=post)
+                images = Medias.objects.filter(post=post)
                 for image in images:
                     cloudinary.uploader.destroy(image.public_id)
                 post.delete()
