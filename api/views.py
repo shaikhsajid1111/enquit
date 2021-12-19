@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from users.models import CustomUser, ReportAccount
-from post.models import Post, ReportOfAnswer, Tags, Vote, Report, Images, Answer_Vote, Answer, Vault
+from post.models import Post, ReportOfAnswer, Tags, Vote, Post_Report, Medias, Answer_Vote, Answer, Vault
 from django.contrib.auth.decorators import login_required
 import cloudinary  # external library
 import cloudinary.uploader  # external library
@@ -17,7 +17,10 @@ def vote_post(request, post_id):
     # if it is POST method
     if request.method == "GET":
         user = CustomUser.objects.get(user=request.user)  # fetch the user
-        post = Post.objects.get(post_id=post_id)  # fetch the post
+        try:
+            post = Post.objects.get(post_id=post_id)  # fetch the post
+        except Post.DoesNotExist:
+            return JsonResponse({"status": 404, "message": "Does not exists!"})
         try:
             # if vote is already done then un-vote by deleting the response
             vote = Vote.objects.get(user=user, post=post)
@@ -41,7 +44,10 @@ def vote_answer(request, answer_id):
     """
     if request.method == "GET":
         user = CustomUser.objects.get(user=request.user)
-        answer = Answer.objects.get(id=answer_id)
+        try:
+            answer = Answer.objects.get(id=answer_id)
+        except Answer.DoesNotExist:
+            return JsonResponse({"status": 404, "message": "Does not exists!"})
         try:
             # if vote is already done then un-vote by deleting the response
 
@@ -69,18 +75,25 @@ def report_post(request, post_id):
     if request.method == "GET":
 
         user = CustomUser.objects.get(user=request.user)
-        post = Post.objects.get(post_id=post_id)
-        new_report, created = Report.objects.get_or_create(
+        try:
+            post = Post.objects.get(post_id=post_id)
+        except Post.DoesNotExist:
+            return JsonResponse({"status": 404, "message": "Does not exists!"})
+        new_report, created = Post_Report.objects.get_or_create(
             user=user, post=post)
-        report_counts = Report.objects.filter(
-            post=post).count()  # number of reports
+        if created is True:
+            previous_count = post.report_count
+            current_count = previous_count + 1
+            post.report_count = current_count
+            post.save()
+        report_counts = post.report_count  # number of reports
         number_of_users = CustomUser.objects.all().count()  # number of total users
-        print("Percentage: ", (2/100)*number_of_users)
-        # if 2% of total users on the site reports than the post's should be deleted automatically
-        if report_counts > (2/100)*number_of_users:
-            images = Images.objects.filter(post=post)
-            for image in images:
-                cloudinary.uploader.destroy(image.public_id)
+        print("Percentage: ", (35/100)*number_of_users)
+        # if 35% of total users on the site reports than the post's should be deleted automatically
+        if report_counts > (35/100)*number_of_users:
+            medias = Medias.objects.filter(post=post)
+            for media in medias:
+                cloudinary.uploader.destroy(media.public_id)
             post.delete()
         return JsonResponse({"status": 200, "message": "Reported!"})
     else:
@@ -96,19 +109,27 @@ def report_answer(request, answer_id):
     """
     if request.method == "GET":
         user = CustomUser.objects.get(user=request.user)
-        answer = Answer.objects.get(id=answer_id)
+        try:
+            answer = Answer.objects.get(id=answer_id)
+        except Answer.DoesNotExist:
+            return JsonResponse({"status": 404, "message": "Does not exists!"})
         new_report, created = ReportOfAnswer.objects.get_or_create(
             user=user, answer=answer)
-        report_counts = ReportOfAnswer.objects.filter(
-            answer=answer).count()  # number of reports
+        if created is True:
+            previous_report_count = answer.report_count
+            current_count = previous_report_count + 1
+            answer.report_count = current_count
+            answer.save()
+        report_counts = answer.report_count  # number of reports
         number_of_users = CustomUser.objects.all().count()  # number of total users
-        print("Percentage: ", (2/100)*number_of_users)
+        print("Percentage: ", (35/100)*number_of_users)
         # if 2% of total users on the site reports than the post's should be deleted automatically
-        if report_counts > (2/100)*number_of_users:
+        if report_counts > (35/100)*number_of_users:
             answer.delete()
         return JsonResponse({"status": 200, "message": "Reported!"})
     else:
         return JsonResponse({"status": 405, "message": "Method Not Allowed"})
+
 
 @login_required
 def report_account(request, account_id):
@@ -119,14 +140,22 @@ def report_account(request, account_id):
     """
     if request.method == "GET":
         user = CustomUser.objects.get(user=request.user)
-        account_to_report = CustomUser.objects.get(id=account_id)
-        new_report, created = ReportAccount.objects.get_or_create(user=user,report=account_to_report)
-        report_counts = ReportAccount.objects.filter(
-            report=account_to_report).count()  # number of reports
+        try:
+            account_to_report = CustomUser.objects.get(id=account_id)
+        except CustomUser.DoesNotExist:
+            return JsonResponse({"status": 404, "message": "Does not exists!"})
+        new_report, created = ReportAccount.objects.get_or_create(
+            user=user, report=account_to_report)
+        if created is True:
+            previous_count = account_to_report.report_count
+            current_count = previous_count + 1
+            account_to_report.report_count = current_count
+            account_to_report.save()
+        report_counts = account_to_report.report_count  # number of reports
         number_of_users = CustomUser.objects.all().count()  # number of total users
-        print("Percentage: ", (2/100)*number_of_users)
+        print("Percentage: ", (35/100)*number_of_users)
         # if 15% of total users on the site reports than the post's should be deleted automatically
-        if report_counts > (15/100)*number_of_users:
+        if report_counts > (35/100)*number_of_users:
             account_to_report.delete()
         return JsonResponse({"status": 200, "message": "Reported!"})
     else:
@@ -167,7 +196,10 @@ def save_answer(request, post_id):
     """
     if request.method == "GET":
         user = CustomUser.objects.get(user=request.user)
-        post = Post.objects.get(post_id=post_id)
+        try:
+            post = Post.objects.get(post_id=post_id)
+        except Post.DoesNotExist:
+            return JsonResponse({"status": 404, "message": "Does not exists!"})
         try:
             item = Vault.objects.get(user=user, post=post)
             item.delete()
@@ -190,10 +222,11 @@ def fetch_posts(request, page_number):
         try:
             offset = (int(page_number)*10)-10  # number of entry to leave
             limits = int(page_number)*10  # number of entry limit
+
             custom_user = CustomUser.objects.get(
                 user=request.user)  # get the user
             # get the posts within limit and offset range
-            posts = Post.objects.filter(author=custom_user)[offset:limits]
+            posts = Post.objects.all()[offset:limits]
             posts_data = []  # list to hold the data
             for post in posts:
                 data = {}  # for holding post's data temporarily
@@ -213,12 +246,12 @@ def fetch_posts(request, page_number):
                 except Vault.DoesNotExist:
                     is_saved = False
                 try:
-                    # fetch the images from the server
-                    images = Images.objects.filter(post=post)
-                    # fetch the image URL
-                    images = [image.url for image in images]
-                except Images.DoesNotExist:
-                    images = []
+                    # fetch the medias from the server
+                    medias = Medias.objects.filter(post=post)
+                    # fetch the media URL
+                    medias = [media.url for media in medias]
+                except Medias.DoesNotExist:
+                    medias = []
                 try:
                     tags = Tags.objects.filter(tag=post)
                     tags = [tag.text for tag in tags]
@@ -233,13 +266,13 @@ def fetch_posts(request, page_number):
                 author_temp_data = {
                     "user_id": post.author.id,
                     "username": post.author.user.username,
-                    "profile_image": post.author.profile_picture_link,
+                    "profile_media": post.author.profile_picture_link,
                     "is_verified": post.author.is_verified
                 }
                 # assign the data with respective keys
                 data['author'] = author_temp_data
                 data['post'] = post_data_temp
-                data['images'] = images
+                data['medias'] = medias
                 data['is_saved'] = is_saved
                 data['already_voted'] = already_voted
                 data['tags'] = tags
@@ -266,7 +299,10 @@ def fetch_user_posts(request, username, page_number):
         try:
             offset = (int(page_number)*10)-10
             limits = int(page_number)*10
-            user = User.objects.get(username=username)
+            try:
+                user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                return JsonResponse({"status": 404, "message": "Does not exists!", "posts_data": []})
             custom_user = CustomUser.objects.get(user=user)
             try:
                 posts = Post.objects.filter(author=custom_user)[offset:limits]
@@ -291,10 +327,10 @@ def fetch_user_posts(request, username, page_number):
                 except Vault.DoesNotExist:
                     is_saved = False
                 try:
-                    images = Images.objects.filter(post=post)
-                    images = [image.url for image in images]
-                except Images.DoesNotExist:
-                    images = []
+                    medias = Medias.objects.filter(post=post)
+                    medias = [media.url for media in medias]
+                except Medias.DoesNotExist:
+                    medias = []
 
                 post_data_temp = {
                     "post_id": post.post_id,
@@ -304,7 +340,7 @@ def fetch_user_posts(request, username, page_number):
                 author_temp_data = {
                     "user_id": post.author.id,
                     "username": post.author.user.username,
-                    "profile_image": post.author.profile_picture_link,
+                    "profile_media": post.author.profile_picture_link,
                     "is_verified": post.author.is_verified
                 }
                 try:
@@ -314,13 +350,13 @@ def fetch_user_posts(request, username, page_number):
                     tags = []
                 data['author'] = author_temp_data
                 data['post'] = post_data_temp
-                data['images'] = list(images)
+                data['medias'] = list(medias)
                 data['is_saved'] = is_saved
                 data['already_voted'] = already_voted
                 data['tags'] = tags
                 posts_data.append(data)
 
-              # send the data to home page as well
+                # send the data to home page as well
             return JsonResponse({"status": 200, "posts_data": posts_data})
         except Exception as ex:
             print("Error: ", ex)
@@ -342,8 +378,11 @@ def fetch_answers(request, post_id, page_number):
         try:
             offset = (int(page_number)*10)-10  # number of entry to leave
             limits = int(page_number)*10  # number of entry limit
-            custom_user = CustomUser.objects.get(
-                user=request.user)  # get the user
+            try:
+                custom_user = CustomUser.objects.get(
+                    user=request.user)  # get the user
+            except CustomUser.DoesNotExist:
+                return JsonResponse({"status": 404, "message": "Does not exists!", "posts_data": []})
             # get the posts within limit and offset range
             try:
                 post = Post.objects.get(post_id=post_id)
@@ -383,7 +422,7 @@ def fetch_answers(request, post_id, page_number):
                 author_temp_data = {
                     "user_id": answer.user.id,
                     "username": answer.user.user.username,
-                    "profile_image": answer.user.profile_picture_link,
+                    "profile_media": answer.user.profile_picture_link,
                     "is_verified": answer.user.is_verified
                 }
                 try:
@@ -442,10 +481,10 @@ def fetch_saved_posts(request, page_number):
                 except Vault.DoesNotExist:
                     is_saved = False
                 try:
-                    images = Images.objects.filter(post=vault_item.post)
-                    images = [image.url for image in images]
-                except Images.DoesNotExist:
-                    images = []
+                    medias = Medias.objects.filter(post=vault_item.post)
+                    medias = [media.url for media in medias]
+                except Medias.DoesNotExist:
+                    medias = []
                 post_data_temp = {
                     "post_id": vault_item.post.post_id,
                     "text": vault_item.post.text,
@@ -454,7 +493,7 @@ def fetch_saved_posts(request, page_number):
                 author_temp_data = {
                     "user_id": vault_item.post.author.id,
                     "username": vault_item.post.author.user.username,
-                    "profile_image": vault_item.post.author.profile_picture_link,
+                    "profile_media": vault_item.post.author.profile_picture_link,
                     "is_verified": vault_item.post.author.is_verified
                 }
                 try:
@@ -464,7 +503,7 @@ def fetch_saved_posts(request, page_number):
                     tags = []
                 data['author'] = author_temp_data
                 data['post'] = post_data_temp
-                data['images'] = list(images)
+                data['medias'] = list(medias)
                 data['is_saved'] = is_saved
                 data['already_voted'] = already_voted
                 data['tags'] = tags
@@ -514,10 +553,10 @@ def fetch_posts_by_tag(request, tag, page_number):
                 except Vault.DoesNotExist:
                     is_saved = False
                 try:
-                    images = Images.objects.filter(post=post)
-                    images = [image.url for image in images]
-                except Images.DoesNotExist:
-                    images = []
+                    medias = Medias.objects.filter(post=post)
+                    medias = [media.url for media in medias]
+                except Medias.DoesNotExist:
+                    medias = []
 
                 post_data_temp = {
                     "post_id": post.post_id,
@@ -527,7 +566,7 @@ def fetch_posts_by_tag(request, tag, page_number):
                 author_temp_data = {
                     "user_id": post.author.id,
                     "username": post.author.user.username,
-                    "profile_image": post.author.profile_picture_link,
+                    "profile_media": post.author.profile_picture_link,
                     "is_verified": post.author.is_verified
                 }
                 try:
@@ -537,7 +576,7 @@ def fetch_posts_by_tag(request, tag, page_number):
                     tags = []
                 data['author'] = author_temp_data
                 data['post'] = post_data_temp
-                data['images'] = list(images)
+                data['medias'] = list(medias)
                 data['is_saved'] = is_saved
                 data['already_voted'] = already_voted
                 data['tags'] = tags
@@ -568,13 +607,13 @@ def fetch_search_result(request, query, page_number):
                     data = {
                         "user_id": user.id,
                         "username": user.user.username,
-                        "profile_image": user.profile_picture_link,
+                        "profile_media": user.profile_picture_link,
                         "is_verified": user.is_verified
                     }
                     users_data.append(data)
                 return JsonResponse({"status": 200, "data": users_data, "type": "user"})
             else:
-              # if the query starts with text then it means we need to find from the text
+                # if the query starts with text then it means we need to find from the text
                 posts = Post.objects.filter(
                     text__contains=str(query))[offset:limits]
                 posts_data = []
@@ -594,10 +633,10 @@ def fetch_search_result(request, query, page_number):
                     except Vault.DoesNotExist:
                         is_saved = False
                     try:
-                        images = Images.objects.filter(post=post)
-                        images = [image.url for image in images]
-                    except Images.DoesNotExist:
-                        images = []
+                        medias = Medias.objects.filter(post=post)
+                        medias = [media.url for media in medias]
+                    except Medias.DoesNotExist:
+                        medias = []
 
                     post_data_temp = {
                         "post_id": post.post_id,
@@ -607,13 +646,13 @@ def fetch_search_result(request, query, page_number):
                     author_temp_data = {
                         "user_id": post.author.id,
                         "username": post.author.user.username,
-                        "profile_image": post.author.profile_picture_link,
+                        "profile_media": post.author.profile_picture_link,
                         "is_verified": post.author.is_verified
                     }
 
                     data['author'] = author_temp_data
                     data['post'] = post_data_temp
-                    data['images'] = list(images)
+                    data['medias'] = list(medias)
                     data['is_saved'] = is_saved
                     data['already_voted'] = already_voted
                     posts_data.append(data)

@@ -2,77 +2,96 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from users.models import CustomUser
-from .models import Post, Images, Answer, Vault, Tags, Vote
+from .models import Post, Medias, Answer, Vault, Tags, Vote
 import cloudinary  # external library
 import cloudinary.uploader  # external library
 
 
 @login_required(login_url="/account/login")
 def create_post(request):
+    """function to create post"""
     if request.method == "GET":
+      #if GET request then render its HTML
         return render(request, "create_post.html")
     if request.method == "POST":
+        #extract respective content from the request
         text = request.POST['text']
-        images = request.FILES.getlist('images')
+        medias = request.FILES.getlist('medias')
         tags = request.POST['tags']
         user = CustomUser.objects.get(user=request.user)
-        post = Post(text=text, author=user)
+        post = Post(text=text, author=user) #create post
         post.save()
-        for image in images:
+        for media in medias:
+          #upload media to the cloudinary server
             if post is not None:
-                result = cloudinary.uploader.upload(image)
-                print(result)
-                image_obj = Images.objects.create(
+                result = cloudinary.uploader.upload_large(media) #upload
+                #create object for the uploaded file
+                media_obj = Medias.objects.create(
                     url=result["url"], public_id=result['public_id'], post=post)
-        post.save()
+        post.save() #save to the DB
         for tag in tags.split(" "):
-            tag_obj = Tags.objects.create(text=tag, tag=post)
-            tag_obj.save()
+            #split out tags from the given tags
+            tag_obj = Tags.objects.create(text=tag, tag=post) #create tag obj
+            tag_obj.save() #save
 
-        messages.success(request, "Post Created Successfully!")
+        messages.success(request, "Post Created Successfully!") #send success message to the front-end
         return redirect("/")
 
 
 @login_required(login_url="/account/login")
 def delete_post(request, id):
+    """function to delete post"""
     if request.method == "GET":
         try:
+            #try to find the post
             post = Post.objects.get(post_id=id)
         except Post.DoesNotExist:
+            #if post does not exists, set it to None
             post = None
         if post is None:
-            messages.error(request, "Post Does Not Exists!")
-            return redirect("/")
+            #if post was not found
+            messages.error(request, "Post Does Not Exists!") #send error to front-end
+            return redirect("/") #redirect to the homepage
         elif request.user.id != post.author.id:
-            messages.error(request, "Permission Denied!")
+          #if someone is trying to delete someone else's post
+            messages.error(request, "Permission Denied!") #send error message to front-end
             return redirect("/")
         else:
-            images = Images.objects.filter(post=post)
-            for image in images:
-                cloudinary.uploader.destroy(image.public_id)
-            post.delete()
+            #if no problem occured, delete the post
+            medias = Medias.objects.filter(post=post)
+            for media in medias:
+                #delete all the media of the post
+                cloudinary.uploader.destroy(media.public_id)
+            post.delete() #delete the post
             messages.success(request, "Post deleted!")
-            return redirect("/")
+            return redirect("/") #to the home page
 
 
 @login_required(login_url="/account/login")
 def view_post(request, post_id):
+    """function to view post"""
     if request.method == "GET":
-        post = Post.objects.get(post_id=post_id)
+        post = Post.objects.get(post_id=post_id) #find the post
+
+        #find all parent answers, exclude the replies for the answer hence the "parent=None" was passed
         answers = Answer.objects.filter(post=post, parent=None)
         data = []
         for answer in answers:
+            #traverse through all answers and find their replies as well
             temp_data = {}
             temp_data['answer'] = answer
             replies_list = []
             try:
+                #find all replies to the parent answer
                 replies = Answer.objects.filter(parent=answer)
             except:
+                #if error occurs in finding
                 replies = []
             for reply in replies:
+                #traverse over the replies and save it to the list
                 replies_list.append(reply)
             temp_data['replies'] = replies_list
-            data.append(temp_data)
+            data.append(temp_data) #append the dict into the list
         return render(request, "post_details.html", {"post_data": post, "answers": data})
 
 
@@ -142,15 +161,15 @@ def view_by_tag(request, tag):
                 votes = 0
             data['votes'] = votes
             try:
-                images = Images.objects.filter(post=post)
-            except Images.DoesNotExist:
-                images = []
+                medias = Medias.objects.filter(post=post)
+            except Medias.DoesNotExist:
+                medias = []
             try:
               tags = Tags.objects.filter(tag=post)
               tags = [tagg.text for tagg in tags]
             except Tags.DoesNotExist:
               tags = []
-            data['images'] = images
+            data['medias'] = medias
             data['post'] = post
             data['already_voted'] = already_voted
             posts_data.append(data)
