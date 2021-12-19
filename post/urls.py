@@ -1,7 +1,7 @@
 from os import name
 from django.urls import path
 
-from ajax.views import delete_answer
+from api.views import delete_answer
 from . import views
 from django.contrib.auth import views as auth_views
 
