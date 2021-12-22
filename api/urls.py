@@ -17,5 +17,6 @@ urlpatterns = [
     path("fetch_search_result/<query>/<page_number>",views.fetch_search_result),
     path("fetch_by_tag/<tag>/<page_number>", views.fetch_posts_by_tag),
     path("report_account/<account_id>", views.report_account),
+    path("fetch_answer_replies/<parent_id>/<page_number>", views.fetch_answer_replies),
 
 ]
