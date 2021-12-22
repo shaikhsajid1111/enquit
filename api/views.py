@@ -364,6 +364,47 @@ def fetch_user_posts(request, username, page_number):
     else:
         return JsonResponse({"status": 405, "message": "Method Not Allowed"})
 
+@login_required
+def fetch_answer_replies(request,parent_id,page_number):
+  if request.method == "GET":
+    try:
+      offset = (int(page_number)*10)-10  # number of entry to leave
+      limits = int(page_number)*10  # number of entry limit
+      parent = Answer.objects.get(id=parent_id)
+      replies = Answer.objects.filter(parent=parent)[offset:limits]
+      replies_list = []
+      custom_user = CustomUser.objects.get(user=request.user)
+      for reply in replies:
+        try:
+          # count number of votes
+          votes = Answer_Vote.objects.filter(answer=reply).count()
+        except Vote.DoesNotExist:
+          # if no vote exists, set the number to 0
+          votes = 0
+        already_voted = Answer_Vote.objects.filter(
+                    user=custom_user, answer=reply) and True or False
+        temp_data = {}
+        temp_data['reply'] = {
+          "text": reply.text,
+          "posted_on": reply.timestamp,
+          "already_voted" : already_voted,
+          "votes" : votes
+        }
+        temp_data['author'] = {
+          "user_id": reply.user.id,
+          "username" : reply.user.user.username,
+          "profile_media": reply.user.profile_picture_link,
+          "is_verified": reply.user.is_verified
+        }
+        replies_list.append(temp_data)
+      return JsonResponse({"status":200,"message":"success","data":replies_list})
+    except Exception as ex:
+      print(ex)
+      return JsonResponse({"status":400,"message":str(ex)})
+  else:
+    return JsonResponse({"status": 405, "message": "Method Not Allowed"})
+
+
 
 @login_required
 def fetch_answers(request, post_id, page_number):
