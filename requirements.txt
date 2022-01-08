@@ -2,3 +2,5 @@ cloudinary==1.26.0
 Django==3.2.8
 django-environ==0.8.1
 django-utils-six==2.0
+random-username==1.0.2
+requests==2.27.1
