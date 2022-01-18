@@ -58,7 +58,7 @@ def vote_answer(request, answer_id):
         except Answer_Vote.DoesNotExist:
             # if vote is not done then vote by creating and saving the response
 
-            new_vote = Vote.objects.create(user=user, answer=answer)
+            new_vote = Answer_Vote.objects.create(user=user, answer=answer)
             new_vote.save()
             return JsonResponse({"status": 200, "message": "Voted the answer!"})
     else:

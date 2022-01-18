@@ -18,34 +18,28 @@
   {% for answer in answers %}
   <hr>
   {{ answer.answer.text }}
+
+
+  {% if answer.answer.user.user == user %}
    <a href="/post/delete_answer/{{ answer.answer.id }}" class="text-danger">Delete</a>
-   <form action="/api/vote_answer/{{ answer.answer.id }}" method="post">
-     {% csrf_token %}
-    <input type="submit" class="btn btn-secondary" value="Vote">
-   </form>
+   {% endif %}
+   <a href="/api/vote_answer/{{ answer.answer.id }}">Vote</a>
+   <a href="/api/report_answer/{{ answer.answer.id }}">Report</a>
    <form action="post_comment/{{ post_data.post_id }}" method="post">
       {% csrf_token %}
       <input type="hidden" name="parentSno" value="{{ answer.answer.id }}">
       <input type="text" name="text" placeholder="Reply to {{ answer.answer.user.user }}">
       <input type="submit" value="Post reply">
     </form>
-        <form action="/api/report_answer/{{ answer.answer.id }}" method="post">
-          {% csrf_token %}
-          <input type="submit" class="btn btn-danger" value="Report">
-        </form>
+    <br>
 
     {% for reply in answer.replies %}
     Reply : {{ reply.text }}
+    {% if reply.user.user == user %}
     <a href="/post/delete_answer/{{ reply.id }}">Delete</a>
-    <form action="/api/vote_answer/{{ reply.id }}" method="post">
-      {% csrf_token %}
-      <input type="submit" class="btn btn-secondary" value="Vote">
-    </form>
-
-    <form action="/api/report_answer/{{ reply.id }}" method="post">
-      {% csrf_token %}
-      <input type="submit" class="btn btn-danger" value="Report">
-    </form>
+    {% endif %}
+    <a href="/api/vote_answer/{{ reply.id }}">Vote</a>
+<a href="/api/report_answer/{{ reply.id }}">Report</a>
 
     <br>
     {% endfor %}
