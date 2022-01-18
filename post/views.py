@@ -5,7 +5,7 @@ from users.models import CustomUser
 from .models import Post, Medias, Answer, Vault, Tags, Vote
 import cloudinary  # external library
 import cloudinary.uploader  # external library
-
+from django.http import HttpResponseRedirect
 
 @login_required(login_url="/account/login")
 def create_post(request):
@@ -44,7 +44,7 @@ def delete_post(request, id):
     if request.method == "GET":
         try:
             #try to find the post
-            post = Post.objects.get(post_id=id)
+            post = Post.objects.get(fid=id)
         except Post.DoesNotExist:
             #if post does not exists, set it to None
             post = None
@@ -108,13 +108,13 @@ def post_answer(request, post_id):
             answer = Answer(text=text, user=customer_user,
                             post=post, parent=parent_answer)
             answer.save()
-            return redirect("/")
+            return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
         else:
             post = Post.objects.get(post_id=post_id)
             customer_user = CustomUser.objects.get(user=user)
             answer = Answer(text=text, user=customer_user, post=post)
             answer.save()
-        return redirect("/")
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
 @login_required
@@ -128,7 +128,7 @@ def delete_answer(request, answer_id):
             answer = None
         if answer is not None and answer.user == custom_user:
             answer.delete()
-            return redirect("/")
+            return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
         else:
             messages.error(request, "Permission denied!")
             return redirect("/")
