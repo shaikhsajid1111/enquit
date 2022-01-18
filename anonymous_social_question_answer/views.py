@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from users.models import CustomUser
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from post.models import Images, Post, Vote, Tags
+from post.models import Medias, Post, Vote, Tags
 
 
 @login_required
@@ -27,15 +27,15 @@ def home(request):
                 data['votes'] = votes
 
                 try:
-                    images = Images.objects.filter(post=post)
-                except Images.DoesNotExist:
-                    images = []
+                    Medias = Medias.objects.filter(post=post)
+                except Medias.DoesNotExist:
+                    Medias = []
                 try:
                     tags = Tags.objects.filter(tag=post)
                     tags = [tag.text for tag in tags]
                 except Tags.DoesNotExist:
                     tags = []
-                data['images'] = images
+                data['Medias'] = Medias
                 data['post'] = post
                 data['already_voted'] = already_voted
                 data['tags'] = tags
