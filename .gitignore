@@ -5,3 +5,9 @@ ajax/migrations
 /*/*.env
 *.env
 post/migrations
+/virtual_env
+file.txt
+test.py
+to-do.txt
+.vscode
+/api/migrations

@@ -20,7 +20,8 @@ from . import views
 admin.site.site_header = "<app_name> Administration"
 
 urlpatterns = [
-    path("",views.home,name="home"),
+    path("", views.blank_route, name="blank"),
+    path("home/<page_number>",views.home,name="home"),
     path('admin/', admin.site.urls),
     path("search/<page_number>", views.search, name="search"),
     path("api/",include("api.urls")), #route starts with ajax/ than call from ajax application

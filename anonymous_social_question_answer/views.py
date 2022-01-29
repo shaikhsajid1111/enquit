@@ -6,13 +6,21 @@ from post.models import Post, Vote, Tags, Medias
 
 
 @login_required
-def home(request):
+def blank_route(request):
+  return redirect("/home/1")
+
+@login_required
+def home(request,page_number):
     """this views is called when the user hits the route domain/home"""
     try:
         if request.user.is_authenticated and not request.user.is_superuser:
             user_data = CustomUser.objects.get(
                 user=request.user)  # fetch the user from database
-            posts = Post.objects.all()[:10]
+            offset = (int(page_number)*10)-10  # number of entry to leave
+            limits = int(page_number)*10  # number of entry limit
+            posts = Post.objects.all()[offset:limits]
+            last_entry = Post.objects.last()
+            is_last_page = True if last_entry == (list(posts))[-1] else False
             posts_data = []
             for post in posts:
 
@@ -41,7 +49,7 @@ def home(request):
                 data['tags'] = tags
                 posts_data.append(data)
             # send the data to home page as well
-            return render(request, "home.html", {"user_data": user_data, "posts_data": (posts_data), "title": "Website Name"})
+            return render(request, "home.html", {"user_data": user_data, "posts_data": (posts_data), "title": "Website Name","next_page":int(page_number)+1,"is_last_page":is_last_page})
         else:
             # if the user is unauthenticated
             messages.warning(request, "Only Registered user allowed")

@@ -4,6 +4,7 @@
 <a href="/account/view/{{user}}">
   {{user}}
 </a>
+
 {{user.email}}
 <a class="btn btn-info" href="/post/create_post">Create Post</a>
 <a class="btn btn-info" href="/post/saved/1">Saved Post</a>
@@ -14,25 +15,23 @@
 <h3>{{ post.post.title }}</h3>
 <a class="btn btn-primary" href="/post/view/{{ post.post.post_id }}">Read</a>
 <a class="btn btn-success" href="/api/vote_post/{{post.post.post_id}}">Vote</a>
-<a class="btn btn-warning" href="/api/save/{{post.post.post_id}}">Save</a>
-{% if user ==  post.post.author.user %}
-<a class="btn btn-danger" href="/post/delete_post/{{post.post.post_id}}">Delete</a>
-{% endif %}
+<a class="btn btn-warning" href="/api/save/{{post.post.post_id}}">Remove</a>
 <a class="btn btn-danger" href="/api/report_post/{{post.post.post_id}}">Report</a>
- <i class="fa fa-clock"></i> {{post.post.posted_on}}
+<i class="fa fa-clock"></i> {{post.post.posted_on}}
 {% for image in post.images %}
 <img src="{{ image.url }}" width="50" height="50" alt="">
 {% endfor %}
 <i class="fa fa-vote-yea"></i> {{ post.votes }}
 {% for tag in post.tags %}
-  <p> <a href="/post/tag/{{tag}}">#{{tag}}</a> </p>
+<p> <a href="/post/tag/{{tag}}">#{{tag}}</a> </p>
 {% endfor %}
 <br>
 <hr>
 {% endfor %}
 {% load static %}
 {% if not is_last_page %}
-<a class="btn btn-info" href="/home/{{ next_page }}">Next Page</a>
+
+<a class="btn btn-info" href="/post/saved/{{ next_page }}">Next Page</a>
 {% endif %}
 <script src="{% static 'js/home.js' %}"></script>
 {% endblock %}
