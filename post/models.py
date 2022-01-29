@@ -6,6 +6,7 @@ class Post(models.Model):
     post_id = models.AutoField(primary_key=True)
     author = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, null=False)
+    title = models.TextField(default='')
     text = models.TextField(default="")
     posted_on = models.DateTimeField(default=now, editable=False)
     report_count = models.IntegerField(default=0)

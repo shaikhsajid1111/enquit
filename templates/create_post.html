@@ -3,8 +3,10 @@
 {% block content %}
 <form method="post" enctype="multipart/form-data">
   {% csrf_token %}
+
+  <input type="text" name="title" placeholder="Title" id="title" required><br>
   <input type="text" name="text" placeholder="What do you want to write?" id="text"><br>
-  <input type="text" name="tags" placeholder="Enter Tags Separated by Space">
+  <input type="text" name="tags" placeholder="Enter Tags Separated by Space" required>
   <input type="file" name="medias" id="images" multiple> <br>
   <input type="submit" value="Create Post">
 </form>

@@ -8,7 +8,8 @@ urlpatterns = [
     path("logout", views.log_out, name="logout"),
     path("delete", views.delete_user, name="delete_user"),
 
-    path("view/<username>", views.view_user, name="view_user"),
+    path("view/<username>/<page_number>", views.view_user, name="view_user"),
+    path("view/<username>", views.blank_route_view_user, name="view_user_blank"),
 
     # views to activate account
     path("activate/<uid64>/<token>", views.activate, name="activate"),

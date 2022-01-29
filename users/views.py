@@ -15,7 +15,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_text
 from django.utils.encoding import force_text
 import environ  # external library
-from post.models import Post, Medias
+from post.models import Post, Medias,Vote,Tags
 import cloudinary.uploader
 # To read environment variable
 env = environ.Env()
@@ -187,9 +187,55 @@ def activate(request, uid64, token):
         return HttpResponse("We Apologize but your activation Link is Invalid!")
 
 
-def view_user(request, username):
-    user = User.objects.get(username=username)
-    custom_user = CustomUser.objects.get(user=user)
-    posts = Post.objects.filter(author=custom_user)[:10]
-    # send the data to home page as well
-    return render(request, "home.html", {"user_data": custom_user, "posts_data": (posts), "title": "Feed - {}".format(username)})
+def view_user(request, username, page_number):
+    try:
+        if request.user.is_authenticated and not request.user.is_superuser:
+            user = User.objects.get(username=username)
+            user_data = CustomUser.objects.get(
+                user=user)  # fetch the user from database
+            offset = (int(page_number)*10)-10  # number of entry to leave
+            limits = int(page_number)*10  # number of entry limit
+            posts = Post.objects.all()[offset:limits]
+            last_entry = Post.objects.last()
+            is_last_page = True if last_entry == (list(posts))[-1] else False
+            posts_data = []
+            for post in posts:
+
+                data = {}
+
+                already_voted = Vote.objects.filter(
+                    user=user_data, post=post) and True or False
+                try:
+                    votes = Vote.objects.filter(post=post).count()
+                except Vote.DoesNotExist:
+                    votes = 0
+                data['votes'] = votes
+
+                try:
+                    medias = Medias.objects.filter(post=post)
+                except Medias.DoesNotExist:
+                    medias = []
+                try:
+                    tags = Tags.objects.filter(tag=post)
+                    tags = [tag.text for tag in tags]
+                except Tags.DoesNotExist:
+                    tags = []
+                data['medias'] = medias
+                data['post'] = post
+                data['already_voted'] = already_voted
+                data['tags'] = tags
+                posts_data.append(data)
+            # send the data to home page as well
+            return render(request, "view_user.html", {"user_data": user_data, "posts_data": (posts_data), "title": "Website Name", "next_page": int(page_number)+1,"is_last_page":is_last_page})
+        else:
+            # if the user is unauthenticated
+            messages.warning(request, "Only Registered user allowed")
+            return redirect("/account/signup")
+    except Exception as ex:
+        print("View Route: ", ex)
+        return redirect("/account/signup")
+
+
+@login_required
+def blank_route_view_user(request, username):
+    return redirect("/account/view/{}/1".format(username))
