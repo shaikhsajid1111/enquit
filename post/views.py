@@ -13,7 +13,7 @@ def create_post(request):
     """function to create post"""
     if request.method == "GET":
       # if GET request then render its HTML
-        return render(request, "create_post.html")
+        return render(request, "create_post.html",{"title":"Create a Post"})
     if request.method == "POST":
         # extract respective content from the request
         text = request.POST['text']
@@ -36,7 +36,8 @@ def create_post(request):
         post.save()  # save to the DB
         for tag in tags.split(" "):
             # split out tags from the given tags
-            tag_obj = Tags.objects.create(text=tag, tag=post)  # create tag obj
+            tag_obj = Tags.objects.create(
+                text=tag.lower(), tag=post)  # create tag obj
             tag_obj.save()  # save
 
         # send success message to the front-end
@@ -83,6 +84,7 @@ def view_post(request, post_id):
 
         # find all parent answers, exclude the replies for the answer hence the "parent=None" was passed
         answers = Answer.objects.filter(post=post, parent=None)
+        medias = Medias.objects.filter(post=post)
         data = []
         for answer in answers:
             # traverse through all answers and find their replies as well
@@ -100,7 +102,8 @@ def view_post(request, post_id):
                 replies_list.append(reply)
             temp_data['replies'] = replies_list
             data.append(temp_data)  # append the dict into the list
-        return render(request, "post_details.html", {"post_data": post, "answers": data})
+        return render(request, "post_details.html", {"post_data": post,
+                                                     "answers": data, "medias": medias, "title": "Website Name - {}".format(post.title)})
 
 
 @login_required
@@ -145,58 +148,71 @@ def delete_answer(request, answer_id):
 @login_required
 def view_saved(request, page_number):
     try:
-      if request.method == "GET":
-        user_data = CustomUser.objects.get(
+        if request.method == "GET":
+            user_data = CustomUser.objects.get(
                 user=request.user)
-        offset = (int(page_number)*10)-10  # number of entry to leave
-        limits = int(page_number)*10  # number of entry limit
-        user = request.user
-        custom_user = CustomUser.objects.get(user=user)
-        saved_posts = Vault.objects.filter(user=custom_user)[offset:limits]
-        posts = [saved.post for saved in saved_posts][offset:limits]
-        posts_data = []
-        last_entry = Vault.objects.filter(user=custom_user).last()
-        is_last_page = True if last_entry.post == (list(posts))[-1] else False
-        print(is_last_page)
-        for post in posts:
-          data = {}
-          already_voted = Vote.objects.filter(
+            offset = (int(page_number)*10)-10  # number of entry to leave
+            limits = int(page_number)*10  # number of entry limit
+            user = request.user
+            custom_user = CustomUser.objects.get(user=user)
+            saved_posts = Vault.objects.filter(user=custom_user)[offset:limits]
+            posts = [saved.post for saved in saved_posts]
+            posts_data = []
+            last_entry = Vault.objects.filter(user=custom_user).last()
+            is_last_page = False
+            if last_entry is not None:
+                if last_entry.post == (list(posts))[-1]:
+                    is_last_page = True
+            for post in posts:
+                data = {}
+                already_voted = Vote.objects.filter(
                     user=user_data, post=post) and True or False
-          try:
-              votes = Vote.objects.filter(post=post).count()
-          except Vote.DoesNotExist:
-              votes = 0
-          data['votes'] = votes
-          try:
-              medias = Medias.objects.filter(post=post)
-          except Medias.DoesNotExist:
-              medias = []
-          try:
-              tags = Tags.objects.filter(tag=post)
-              tags = [tag.text for tag in tags]
-          except Tags.DoesNotExist:
-              tags = []
-          data['medias'] = medias
-          data['post'] = post
-          data['already_voted'] = already_voted
-          data['tags'] = tags
-          posts_data.append(data)
-            # send the data to home page as well
-          return render(request, "saved_items.html", {"posts_data": saved_posts, "user_data": user_data, "next_page": int(page_number)+1,"is_last_page":is_last_page})
+                try:
+                    votes = Vote.objects.filter(post=post).count()
+                except Vote.DoesNotExist:
+                    votes = 0
+                data['votes'] = votes
+                try:
+                    medias = Medias.objects.filter(post=post)
+                except Medias.DoesNotExist:
+                    medias = []
+                try:
+                    tags = Tags.objects.filter(tag=post)
+                    tags = [tag.text for tag in tags]
+                except Tags.DoesNotExist:
+                    tags = []
+                try:
+                    is_saved = Vault.objects.get(
+                        post=post, user=user_data)
+                    is_saved = True
+                except Vault.DoesNotExist:
+                    is_saved = False
+                data['medias'] = medias
+                data['post'] = post
+                data['already_voted'] = already_voted
+                data['tags'] = tags
+                data['is_saved'] = is_saved
+                posts_data.append(data)
+            if len(posts_data) == 0:
+                is_last_page = True
+                # send the data to home page as well
+            return render(request, "saved_items.html", {"posts_data": posts_data, "user_data": user_data, "next_page": int(page_number)+1, "is_last_page": is_last_page})
         else:
-          # if the user is unauthenticated
-          messages.warning(request, "Only Registered user allowed")
-          return redirect("/account/signup")
+            # if the user is unauthenticated
+            messages.warning(request, "Only Registered user allowed")
+            return redirect("/account/signup")
     except Exception as ex:
-      print("Saved Vault Route: ", ex)
-      return redirect("/account/signup")
-@login_required
-def blank_route_tag(request,tag):
-  return redirect("/post/tag/{}/1".format(tag))
+        print("Saved Vault Route: ", ex)
+        return redirect("/account/signup")
 
 
 @login_required
-def view_by_tag(request, tag,page_number):
+def blank_route_tag(request, tag):
+    return redirect("/post/tag/{}/1".format(tag))
+
+
+@login_required
+def view_by_tag(request, tag, page_number):
     if request.method == "GET":
         offset = (int(page_number)*10)-10  # number of entry to leave
         limits = int(page_number)*10  # number of entry limit
@@ -231,4 +247,4 @@ def view_by_tag(request, tag,page_number):
             posts_data.append(data)
             # send the data to home page as well
 
-        return render(request, "home.html", {"user_data": user_data, "posts_data": (posts_data), "title": "Website Name - #{}".format(tag),"is_last_page":is_last_page})
+        return render(request, "home.html", {"user_data": user_data, "posts_data": (posts_data), "title": "Website Name - #{}".format(tag), "is_last_page": is_last_page})

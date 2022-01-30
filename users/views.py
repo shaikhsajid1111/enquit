@@ -226,7 +226,7 @@ def view_user(request, username, page_number):
                 data['tags'] = tags
                 posts_data.append(data)
             # send the data to home page as well
-            return render(request, "view_user.html", {"user_data": user_data, "posts_data": (posts_data), "title": "Website Name", "next_page": int(page_number)+1,"is_last_page":is_last_page})
+            return render(request, "view_user.html", {"user_data": user_data, "posts_data": (posts_data), "title": "Website Name - @{}".format(username), "next_page": int(page_number)+1,"is_last_page":is_last_page})
         else:
             # if the user is unauthenticated
             messages.warning(request, "Only Registered user allowed")
