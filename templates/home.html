@@ -13,8 +13,19 @@
 <hr>
 <h3>{{ post.post.title }}</h3>
 <a class="btn btn-primary" href="/post/view/{{ post.post.post_id }}">Read</a>
+{% if post.already_voted %}
+<a class="btn btn-success" href="/api/vote_post/{{post.post.post_id}}">Un-Vote</a>
+{% else %}
 <a class="btn btn-success" href="/api/vote_post/{{post.post.post_id}}">Vote</a>
+
+{% endif %}
+
+{% if post.is_saved  %}
+<a class="btn btn-warning" href="/api/save/{{post.post.post_id}}">Unsave</a>
+{% else %}
 <a class="btn btn-warning" href="/api/save/{{post.post.post_id}}">Save</a>
+{% endif %}
+
 {% if user ==  post.post.author.user %}
 <a class="btn btn-danger" href="/post/delete_post/{{post.post.post_id}}">Delete</a>
 {% endif %}

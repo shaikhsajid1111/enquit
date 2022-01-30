@@ -1,11 +1,13 @@
 {% extends "base_layout.html" %}
 
 {% block content %}
-  {{post_data.author.user.username}}
-  {{ post_data.posted_on }}
-  <h1>{{ post_data.title }}</h1>
-  <h2>{{ post_data.text }}</h2>
-
+{{post_data.author.user.username}}
+{{ post_data.posted_on }}
+<h1>{{ post_data.title }}</h1>
+<h2>{{ post_data.text }}</h2>
+{% for media in medias %}
+<img class="img img-thumbnail" src="{{media.url}}" alt="">
+{% endfor %}
 
 <form action="post_comment/{{ post_data.post_id }}" method="post">
   {% csrf_token %}
@@ -14,37 +16,37 @@
   <input type="submit" value="Post Answer">
 </form>
 
-  Answers:
-  <br>
-  {% for answer in answers %}
-  <hr>
-  {{ answer.answer.text }}
+Answers:
+<br>
+{% for answer in answers %}
+<hr>
+{{ answer.answer.text }}
 
 
-  {% if answer.answer.user.user == user %}
-   <a href="/post/delete_answer/{{ answer.answer.id }}" class="text-danger">Delete</a>
-   {% endif %}
-   <a href="/api/vote_answer/{{ answer.answer.id }}">Vote</a>
-   <a href="/api/report_answer/{{ answer.answer.id }}">Report</a>
-   <form action="post_comment/{{ post_data.post_id }}" method="post">
-      {% csrf_token %}
-      <input type="hidden" name="parentSno" value="{{ answer.answer.id }}">
-      <input type="text" name="text" placeholder="Reply to {{ answer.answer.user.user }}">
-      <input type="submit" value="Post reply">
-    </form>
-    <br>
+{% if answer.answer.user.user == user %}
+<a href="/post/delete_answer/{{ answer.answer.id }}" class="text-danger">Delete</a>
+{% endif %}
+<a href="/api/vote_answer/{{ answer.answer.id }}">Vote</a>
+<a href="/api/report_answer/{{ answer.answer.id }}">Report</a>
+<form action="post_comment/{{ post_data.post_id }}" method="post">
+  {% csrf_token %}
+  <input type="hidden" name="parentSno" value="{{ answer.answer.id }}">
+  <input type="text" name="text" placeholder="Reply to {{ answer.answer.user.user }}">
+  <input type="submit" value="Post reply">
+</form>
+<br>
 
-    {% for reply in answer.replies %}
-    Reply : {{ reply.text }}
-    {% if reply.user.user == user %}
-    <a href="/post/delete_answer/{{ reply.id }}">Delete</a>
-    {% endif %}
-    <a href="/api/vote_answer/{{ reply.id }}">Vote</a>
+{% for reply in answer.replies %}
+Reply : {{ reply.text }}
+{% if reply.user.user == user %}
+<a href="/post/delete_answer/{{ reply.id }}">Delete</a>
+{% endif %}
+<a href="/api/vote_answer/{{ reply.id }}">Vote</a>
 <a href="/api/report_answer/{{ reply.id }}">Report</a>
 
-    <br>
-    {% endfor %}
-    <hr>
-  <br>
-  {% endfor %}
+<br>
+{% endfor %}
+<hr>
+<br>
+{% endfor %}
 {% endblock %}
