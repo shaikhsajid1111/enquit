@@ -60,7 +60,7 @@ def delete_post(request, id):
             # send error to front-end
             messages.error(request, "Post Does Not Exists!")
             return redirect("/")  # redirect to the homepage
-        elif request.user.id != post.author.id:
+        elif request.user.id != post.author.user.id:
             # if someone is trying to delete someone else's post
             # send error message to front-end
             messages.error(request, "Permission Denied!")
