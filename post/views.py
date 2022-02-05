@@ -1,3 +1,4 @@
+from ast import Index
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
@@ -161,8 +162,11 @@ def view_saved(request, page_number):
             last_entry = Vault.objects.filter(user=custom_user).last()
             is_last_page = False
             if last_entry is not None:
-                if last_entry.post == (list(posts))[-1]:
-                    is_last_page = True
+                try:
+                  if last_entry.post == (list(posts))[-1]:
+                      is_last_page = True
+                except IndexError:
+                  is_last_page = True
             for post in posts:
                 data = {}
                 already_voted = Vote.objects.filter(
@@ -222,7 +226,10 @@ def view_by_tag(request, tag, page_number):
         user_data = CustomUser.objects.get(
             user=request.user)  # fetch the user from database
         last_entry = Tags.objects.filter(text=tag).last()
-        is_last_page = True if last_entry.tag == posts[-1] else False
+        try:
+          is_last_page = True if last_entry.tag == posts[-1] else False
+        except IndexError:
+          is_last_page = True
         for post in posts:
             data = {}
             already_voted = Vote.objects.filter(

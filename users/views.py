@@ -197,7 +197,10 @@ def view_user(request, username, page_number):
             limits = int(page_number)*10  # number of entry limit
             posts = Post.objects.all()[offset:limits]
             last_entry = Post.objects.last()
-            is_last_page = True if last_entry == (list(posts))[-1] else False
+            try:
+              is_last_page = True if last_entry == (list(posts))[-1] else False
+            except IndexError:
+              is_last_page = True
             posts_data = []
             for post in posts:
 
