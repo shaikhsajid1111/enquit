@@ -7,6 +7,8 @@
     <input type="password" placeholder="Password" name="password" id="password">
     <input type="submit" value="Log in">
   </form>
+  <a href="/account/password_reset">Forget Password?</a>
+  <a href="/account/signup">Does not have an account?</a>
 
   {% for message in messages %}
   <div class="alert alert-{{ message.tags }}">

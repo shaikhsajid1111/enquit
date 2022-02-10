@@ -101,6 +101,8 @@ def search(request, page_number):
                     text=str(query).removeprefix("#")).last()
                 try:
                   is_last_page = True if last_entry.tag == posts[-1] else False
+                except AttributeError:
+                  is_last_page = True
                 except IndexError:
                   is_last_page = False
                 posts_data = []

@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path,include
 from . import views
 
-admin.site.site_header = "<app_name> Administration"
+admin.site.site_header = "Questionnaire Administration"
 
 urlpatterns = [
     path("", views.blank_route, name="blank"),

@@ -13,10 +13,19 @@ from django.http import HttpResponseRedirect
 def create_post(request):
     """function to create post"""
     if request.method == "GET":
-      # if GET request then render its HTML
-        return render(request, "create_post.html",{"title":"Create a Post"})
+        try:
+          user = CustomUser.objects.get(user=request.user, is_verified=True)
+        #if GET request then render its HTML
+          return render(request, "create_post.html",{"title":"Create a Post"})
+        except CustomUser.DoesNotExist:
+          messages.error(request, "Not Verified!")
+          return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
     if request.method == "POST":
         # extract respective content from the request
+        user = CustomUser.objects.get(user=request.user,is_verified=True)
+        if not user:
+          messages.error(request, "Not Verified!")
+          return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
         text = request.POST['text']
         medias = request.FILES.getlist('medias')
         tags = request.POST['tags']
@@ -24,7 +33,6 @@ def create_post(request):
         if title == "" or tags == "":
             messages.error(request, "Please fill entire details!")
             return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
-        user = CustomUser.objects.get(user=request.user)
         post = Post(text=text, author=user, title=title)  # create post
         post.save()
         for media in medias:
@@ -229,6 +237,8 @@ def view_by_tag(request, tag, page_number):
         try:
           is_last_page = True if last_entry.tag == posts[-1] else False
         except IndexError:
+          is_last_page = True
+        except AttributeError:
           is_last_page = True
         for post in posts:
             data = {}
