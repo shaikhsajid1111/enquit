@@ -1,6 +1,10 @@
 {% extends "base_layout.html" %}
 
 {% block content %}
+<form action="/search/1" method="get">
+  <input type="search" name="query" placeholder="Search" id="query">
+  <input type="submit" value="Search">
+</form>
 {{post_data.author.user.username}}
 {{ post_data.posted_on }}
 <h1>{{ post_data.title }}</h1>

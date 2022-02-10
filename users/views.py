@@ -112,15 +112,17 @@ def signUp(request):
             if password_is_valid(password):
                 try:
                     # search for email, if it already exists in database
-                    user = User.objects.get(email=email)
-                    if user:
-                        # if the user is found that means, the email have been used already and cannot be re-used
-                        # set the error message
-                        messages.error(request, "Email already exists!")
-                        # rediret back to signup page
-                        return render(request, "signup.html")
+                    users = CustomUser.objects.filter(user__email=email,is_verified=False)
+                    for u in users:
+                      print("Deleting...",u.user)
+                      u.user.delete()
+                      u.delete()
 
-                except User.DoesNotExist:  # if the user does not exists, it means its a new email, start the registration process
+                    custom_user = CustomUser.objects.get(user__email=email,is_verified=True)
+                    messages.error(request, "Email already exists!")
+                    return render(request, "signup.html")
+
+                except CustomUser.DoesNotExist:  # if the user does not exists, it means its a new email, start the registration process
                     # generate a random username
                     username = generate_username(1)[0]
                     # get the random image generated with AI using API call
@@ -173,7 +175,9 @@ def activate(request, uid64, token):
         user = CustomUser.objects.get(user=request.user)
         # get the related user with the UID
         related_user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+    except CustomUser.DoesNotExist:
+      return HttpResponse("We Apologize but your activation Link is Invalid!\nYou may Try again after sometime. Thanks")
+    except (TypeError, ValueError, OverflowError):
         # if the user was not found
         user = None
     if user is not None and account_activation_token.check_token(related_user, token):
@@ -184,7 +188,7 @@ def activate(request, uid64, token):
         return HttpResponse("Thank you for registration, Have a great time posting! :)")
     else:
         # on invalid link throw this error
-        return HttpResponse("We Apologize but your activation Link is Invalid!")
+        return HttpResponse("We Apologize but your activation Link is Invalid!. You may Try again after sometime. Thanks")
 
 
 def view_user(request, username, page_number):
@@ -195,9 +199,12 @@ def view_user(request, username, page_number):
                 user=user)  # fetch the user from database
             offset = (int(page_number)*10)-10  # number of entry to leave
             limits = int(page_number)*10  # number of entry limit
-            posts = Post.objects.all()[offset:limits]
-            last_entry = Post.objects.last()
-            is_last_page = True if last_entry == (list(posts))[-1] else False
+            posts = Post.objects.filter(author=user_data)[offset:limits]
+            last_entry = Post.objects.filter(author=user_data).last()
+            try:
+              is_last_page = True if last_entry == (list(posts))[-1] else False
+            except IndexError:
+              is_last_page = True
             posts_data = []
             for post in posts:
 

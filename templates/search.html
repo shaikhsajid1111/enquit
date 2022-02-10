@@ -1,8 +1,17 @@
 {% extends "base_layout.html" %}
+
 {% block content %}
+<form action="/search/1" method="get">
+  <input type="search" name="query" placeholder="Search" id="query">
+  <input type="submit" value="Search">
+</form>
 
 <!--If type is post-->
 {% if type == "post" %}
+{% if posts_data|length == 0 %}
+<br>
+No Post related to "{{query}}"
+{% endif %}
 
 {% for post in posts_data %}
 <hr>
@@ -44,6 +53,10 @@
 
 <!--If type is tags-->
 {% if type == "tags" %}
+{% if posts_data|length == 0 %}
+<br>
+No Post related to tag {{query}}
+{% endif %}
 
 {% for post in posts_data %}
 <hr>
@@ -61,11 +74,10 @@
 {% else %}
 <a class="btn btn-warning" href="/api/save/{{post.post.post_id}}">Save</a>
 {% endif %}
-
 {% if user == post.post.author.user %}
 <a class="btn btn-danger" href="/post/delete_post/{{post.post_id}}">Delete</a>
 {% endif %}
-<a class="btn btn-danger" href="/api/report_post/{{post.post_id}}">Report</a>
+<a class="btn btn-danger" href="/api/report_post/{{post.post.post_id}}">Report</a>
 <i class="fa fa-clock"></i> {{ post.post.posted_on }}
 <i class="fa fa-vote-yea"></i> {{ post.votes }}
 {% for tag in post.tags %}
@@ -81,6 +93,10 @@
 
 <!--If type is user-->
 {% if type == "user" %}
+{% if users_data|length == 0 %}
+<br>
+No User with username "{{query}}" found!
+{% endif %}
 {% for user_model in users_data %}
 <div class="container">
 

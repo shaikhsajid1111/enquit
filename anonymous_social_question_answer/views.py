@@ -22,7 +22,10 @@ def home(request, page_number):
             limits = int(page_number)*10  # number of entry limit
             posts = Post.objects.all()[offset:limits]
             last_entry = Post.objects.last()
-            is_last_page = True if last_entry == (list(posts))[-1] else False
+            try:
+              is_last_page = True if last_entry == (list(posts))[-1] else False
+            except IndexError:
+              is_last_page = True
             posts_data = []
             for post in posts:
 
@@ -80,8 +83,11 @@ def search(request, page_number):
                 users_data = CustomUser.objects.filter(
                     user__username__contains=str(query).removeprefix("@"))[offset:limits]
                 last_entry = CustomUser.objects.last()
-                is_last_page = True if last_entry == (
+                try:
+                  is_last_page = True if last_entry == (
                     list(users_data))[-1] else False
+                except IndexError:
+                  is_last_page = True
                 return render(request, "search.html", {"users_data": users_data,
                                                        "type": "user", "title": "Results for {}".format(query),
                                                        "next_page": int(page_number)+1, "query": query, "is_last_page": is_last_page})
@@ -93,7 +99,12 @@ def search(request, page_number):
                 posts = [post.tag for post in posts_tags]
                 last_entry = Tags.objects.filter(
                     text=str(query).removeprefix("#")).last()
-                is_last_page = True if last_entry.tag == posts[-1] else False
+                try:
+                  is_last_page = True if last_entry.tag == posts[-1] else False
+                except AttributeError:
+                  is_last_page = True
+                except IndexError:
+                  is_last_page = False
                 posts_data = []
                 for post in posts:
                     data = {}
@@ -136,8 +147,11 @@ def search(request, page_number):
                     Q(text__contains=str(query)) | Q(title__contains=str(query)))[offset:limits]
                 last_entry = Post.objects.filter(
                     Q(text__contains=str(query)) | Q(title__contains=str(query))).last()
-                is_last_page = True if last_entry == (
+                try:
+                  is_last_page = True if last_entry == (
                     list(posts))[-1] else False
+                except IndexError:
+                  is_last_page = True
                 posts_data = []
                 for post in posts:
                     data = {}
