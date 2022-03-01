@@ -1,6 +1,11 @@
 {% extends "base_layout.html" %}
 
 {% block content %}
+{% load static %}
+
+</head>
+<body>
+  <div class="container-fluid">
 <a href="/account/view/{{user}}">
   {{user}}
 </a>

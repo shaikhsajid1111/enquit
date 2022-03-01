@@ -1,6 +1,11 @@
 {% extends "base_layout.html" %}
 
 {% block content %}
+{% load static %}
+
+</head>
+<body>
+  <div class="container-fluid">
 <form action="/search/1" method="get">
   <input type="search" name="query" placeholder="Search" id="query">
   <input type="submit" value="Search">
