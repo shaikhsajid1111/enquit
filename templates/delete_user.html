@@ -1,7 +1,12 @@
 {% extends "base_layout.html" %}
 
 {% block content %}
-  <form method="post">
+{% load static %}
+
+</head>
+<body>
+  <div class="container-fluid">
+<form method="post">
     {% csrf_token %}
     <input type="username" placeholder="Username" name="username" id="username">
     <input type="password" placeholder="Password" name="password" id="password">

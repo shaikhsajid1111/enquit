@@ -1,7 +1,15 @@
 {% extends "base_layout.html" %}
 
 {% block content %}
-<form action="/search/1" method="get">
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'stylesheets/home.css' %}">
+</head>
+
+<body>
+  <div class="container-fluid">
+
+  <form action="/search/1" method="get">
   <input type="search" name="query" placeholder="Search" id="query">
   <input type="submit" value="Search">
 </form>
@@ -24,18 +32,18 @@
 {% for post in posts_data %}
 <hr>
 <h3>{{ post.post.title }}</h3>
-<a class="btn btn-primary" href="/post/view/{{ post.post.post_id }}">Read</a>
+<a class="btn btn-primary"  href="/post/view/{{ post.post.post_id }}">Read</a>
 {% if post.already_voted %}
-<a class="btn btn-success" href="/api/vote_post/{{post.post.post_id}}">Un-Vote</a>
+<a class="btn btn-success" id="vote-{{post.post.post_id}}" onclick="votePost({{post.post.post_id}})">Un-Vote</a>
 {% else %}
-<a class="btn btn-success" href="/api/vote_post/{{post.post.post_id}}">Vote</a>
+<a class="btn btn-success" id="vote-{{post.post.post_id}}" onclick="votePost({{post.post.post_id}})">Vote</a>
 
 {% endif %}
 
 {% if post.is_saved  %}
-<a class="btn btn-warning" href="/api/save/{{post.post.post_id}}">Unsave</a>
+<a class="btn btn-warning" id="saved-{{post.post.post_id}}" onclick="savePost({{post.post.post_id}})">Unsave</a>
 {% else %}
-<a class="btn btn-warning" href="/api/save/{{post.post.post_id}}">Save</a>
+<a class="btn btn-warning" id="saved-{{post.post.post_id}}" onclick="savePost({{post.post.post_id}})">Save</a>
 {% endif %}
 
 {% if user ==  post.post.author.user %}
@@ -48,16 +56,17 @@
 {% for image in post.images %}
 <img src="{{ image.url }}" width="50" height="50" alt="">
 {% endfor %}
-<i class="fa fa-vote-yea"></i> {{ post.votes }}
+<i class="fa fa-vote-yea" ></i> <p id="vote-count-{{post.post.post_id}}">{{ post.votes }}</p>
 {% for tag in post.tags %}
   <p> <a href="/post/tag/{{tag}}">#{{tag}}</a> </p>
 {% endfor %}
 <br>
 <hr>
 {% endfor %}
-{% load static %}
 {% if not is_last_page %}
 <a class="btn btn-info" href="/home/{{ next_page }}">Next Page</a>
 {% endif %}
+</div>
+
 <script src="{% static 'js/home.js' %}"></script>
 {% endblock %}
