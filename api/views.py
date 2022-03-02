@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from users.models import CustomUser, ReportAccount
+from django.contrib.auth.models import User
 from post.models import Post, ReportOfAnswer, Tags, Vote, Post_Report, Medias, Answer_Vote, Answer, Vault
 from django.contrib.auth.decorators import login_required
 import cloudinary  # external library
@@ -139,7 +140,8 @@ def report_account(request, account_id):
     if request.method == "GET":
         user = CustomUser.objects.get(user=request.user)
         try:
-            account_to_report = CustomUser.objects.get(id=account_id)
+            user_report = User.objects.get(id=account_id)
+            account_to_report = CustomUser.objects.get(user=user_report)
         except CustomUser.DoesNotExist:
             return JsonResponse({"status": 404, "message": "Does not exists!"})
         new_report, created = ReportAccount.objects.get_or_create(
