@@ -8,14 +8,15 @@
 </head>
 <body style="background-color:rgba(253, 250, 68, 0.993);">
   <div class="container-fluid">
-  <form method="post">
+  <form align="center" method="post" >
     {% csrf_token %}<br>
-    <h1 style="color:black" > LOGIN </h1>
-    <input type="username" placeholder="Username" name="username" id="username"><br>
-    <input type="password" placeholder="Password" name="password" id="password"><br>
+    
+    <h1 style="color:black" > LOGIN </h1> <br><br>
+    <input type="username" placeholder="Username" name="username" id="username" >  <br><br>
+    <input type="password" placeholder="Password" name="password" id="password" align-self:><br><br>
     <input type="submit" value="Log in"><br><br><br>  
   </form>
-  <a href="/account/password_reset">Forget Password?</a>
+  <a href="/account/password_reset" ><p style="text-align:center">Forget Password?</a>
   <a href="/account/signup">Does not have an account?</a><br><br>
   
   
