@@ -17,6 +17,7 @@ from django.utils.encoding import force_text
 import environ  # external library
 from post.models import Post, Medias,Vote,Tags
 import cloudinary.uploader
+from faker import Faker
 # To read environment variable
 env = environ.Env()
 environ.Env.read_env()
@@ -127,8 +128,11 @@ def signUp(request):
                     username = generate_username(1)[0]
                     # get the random image generated with AI using API call
                     image = get_image(gender=gender, age=age)
+                    fake = Faker()
+                    first_name = fake.unique.first_name_female() if gender == 'Female' else fake.unique.first_name_male()
                     user = User.objects.create_user(
-                        username=username, password=password, email=email)  # create the user object
+                        username=username, password=password, email=email,
+                        first_name=first_name,last_name=fake.unique.last_name())  # create the user object
                     # now create the exended model object and set one-to-one relationship with the User object
                     custom_user = CustomUser(
                         user=user, profile_picture_link=image, is_verified=False)
