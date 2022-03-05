@@ -1,5 +1,5 @@
 """
-ASGI config for anonymous_social_question_answer project.
+ASGI config for questionnaire project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'anonymous_social_question_answer.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'questionnaire.settings')
 
 application = get_asgi_application()
