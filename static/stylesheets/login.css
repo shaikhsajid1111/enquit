@@ -1,6 +1,7 @@
+/*  @author Akankshi Gupta <akankshigp12345@gmail.com> */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100&display=swap');
 body {
-    background-image: url("https://images.unsplash.com/photo-1509023464722-18d996393ca8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80") !important;
+    background-image:url("../images/backgound-image.jpg");
     height:100vh;
     background-position: center;
     background-repeat: none !important;
@@ -38,6 +39,9 @@ input[type=submit]{
   border-color: #ffef00;
   border-width: 0;
   font-weight:bold;
+}
+input[type="submit"]:hover {
+  border: 1px solid #f3e73d;
 }
 a:link { 
     color: rgb(255, 255, 255);
