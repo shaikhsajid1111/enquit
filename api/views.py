@@ -327,6 +327,8 @@ def fetch_answers(request, post_id, page_number):
                 data['answer']['replies'] = replies_list
                 data['already_voted'] = already_voted
                 data['tags'] = tags
+                data['username'] = post.username()
+                data['profile_picture_link'] = post.author.profile_picture_link
                 posts_data.append(data)
                 # print(posts_data)
                 # send the data to home page as well
