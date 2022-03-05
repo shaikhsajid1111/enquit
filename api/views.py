@@ -155,8 +155,10 @@ def report_account(request, account_id):
         number_of_users = CustomUser.objects.all().count()  # number of total users
         print("Percentage: ", (35/100)*number_of_users)
         # if 15% of total users on the site reports than the post's should be deleted automatically
-        if report_counts > (35/100)*number_of_users:
+        if report_counts > ((35/100)*number_of_users):
             account_to_report.delete()
+            account_to_report.user.delete()
+            print("Deleted the account!")
         return JsonResponse({"status": 200, "message": "Reported!"})
     else:
         return JsonResponse({"status": 405, "message": "Method Not Allowed"})
