@@ -18,8 +18,8 @@ def home(request, page_number):
         if request.user.is_authenticated and not request.user.is_superuser:
             user_data = CustomUser.objects.get(
                 user=request.user)  # fetch the user from database
-            offset = (int(page_number)*10)-10  # number of entry to leave
-            limits = int(page_number)*10  # number of entry limit
+            offset = (int(page_number)*12)-12  # number of entry to leave
+            limits = int(page_number)*12  # number of entry limit
             posts = Post.objects.all()[offset:limits]
             last_entry = Post.objects.last()
             try:
@@ -28,7 +28,6 @@ def home(request, page_number):
               is_last_page = True
             posts_data = []
             for post in posts:
-
                 data = {}
 
                 already_voted = Vote.objects.filter(
@@ -59,6 +58,8 @@ def home(request, page_number):
                 data['already_voted'] = already_voted
                 data['tags'] = tags
                 data['is_saved'] = is_saved
+                data['username'] = post.username()
+                data['profile_picture_link'] = post.author.profile_picture_link
                 posts_data.append(data)
             # send the data to home page as well
             return render(request, "home.html", {"user_data": user_data, "posts_data": (posts_data), "title": "Website Name", "next_page": int(page_number)+1, "is_last_page": is_last_page})
@@ -135,6 +136,8 @@ def search(request, page_number):
                     data['already_voted'] = already_voted
                     data['tags'] = tags
                     data['is_saved'] = is_saved
+                    data['username'] = post.username()
+                    data['profile_picture_link'] = post.author.profile_picture_link
                     posts_data.append(data)
                 return render(request, "search.html", {"posts_data": posts_data,
                                                        "type": "tags", "title": "Results - {}".format(query),
@@ -183,6 +186,8 @@ def search(request, page_number):
                     data['already_voted'] = already_voted
                     data['tags'] = tags
                     data['is_saved'] = is_saved
+                    data['username'] = post.username()
+                    data['profile_picture_link'] = post.author.profile_picture_link
                     posts_data.append(data)
                 return render(request, "search.html", {"posts_data": posts_data, "type": "post",
                                                        "title": "Results for {}".format(query), "next_page": int(page_number)+1,
