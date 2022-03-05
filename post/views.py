@@ -82,7 +82,8 @@ def delete_post(request, id):
                 cloudinary.uploader.destroy(media.public_id)
             post.delete()  # delete the post
             messages.success(request, "Post deleted!")
-            return redirect("/")  # to the home page
+            # to the home page
+            return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
 @login_required(login_url="/account/login")
