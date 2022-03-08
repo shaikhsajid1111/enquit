@@ -1,4 +1,76 @@
+/*  @author Akankshi Gupta <akankshigp12345@gmail.com> */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100&display=swap');
+body {
+    background-image:url("../images/backgound-image.jpg");
+    height:100vh;
+    background-position: center;
+    background-repeat: none !important;
+    background-size: cover;
+    background-attachment: fixed;
+    font-family: 'Montserrat', sans-serif;
+  }
 h1 {
-    text-align:center
+    text-align:center; 
+    color:black; 
+    font-weight: bold;
+}
+.content{
+    width:600px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: rgb(251, 248, 248);
+    background-color: rgba(253, 253, 253, 0.185);
+}
+input[type=username] , input[type=password]{
+    border-color:#0a0a0a;
+    border-radius: 4px;
+    padding: 10px 20px;
+    margin: 8px 0;
+    border-width:2px; 
     
 }
+input[type=submit]{
+  background-color:#f3e73d ;
+  color:rgb(0, 0, 0) ;
+  padding: 8px 25px;
+  margin: 4px 0;
+  border-color: #ffef00;
+  border-width: 0;
+  font-weight:bold;
+}
+input[type="submit"]:hover {
+  border: 1px solid #f3e73d;
+}
+a:link { 
+    color: rgb(255, 255, 255);
+    background-color: transparent;
+    text-decoration: none;
+  }
+  
+  a:visited {
+    color:rgb(10, 250, 10);
+    background-color: transparent;
+    text-decoration: none;
+  }
+  
+  a:hover {
+    color: rgba(4, 247, 255, 0.986);
+    background-color: transparent;
+    text-decoration: underline;
+  }
+  
+  a:active {
+    color: yellow;
+    background-color: transparent;
+    text-decoration: underline;
+  }
+ 
+  
+      
+  
+  
+  
+  
+  
