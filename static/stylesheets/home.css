@@ -1,0 +1,36 @@
+.fa-check-circle{
+    color: green;
+    cursor: pointer;
+  }
+  .fa-check{
+    color: green;
+    cursor: pointer;
+  
+  }
+  .fa-bookmark{
+    color: green;
+    cursor: pointer;
+  
+  }
+  a{
+    text-decoration: none !important;
+    color: black;
+    display: block;
+  }
+  .fa-trash-alt{
+    cursor: pointer;
+    color: red;
+  }
+  .fa-flag{
+    color: red;
+  }
+  .profile-picture{
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+  }
+  .card{
+    -webkit-box-shadow: 1px 0px 16px 0px rgba(0,0,0,0.75);
+  -moz-box-shadow: 1px 0px 16px 0px rgba(0,0,0,0.75);
+  box-shadow: 1px 0px 16px 0px rgba(0,0,0,0.75);
+  }
