@@ -1,0 +1,14 @@
+/* @author Akankshi Gupta <akankshigp12345@gmail.com> */
+.empty-image{
+    width: 40%;
+  }
+  .pleading-face-image{
+    width: 5rem;
+    height: 5rem;
+  }
+  
+  @media only screen and (max-width: 600px) {
+    .empty-message{
+    padding-top: 50%;
+  }
+  }
