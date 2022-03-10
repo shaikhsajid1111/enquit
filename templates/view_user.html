@@ -1,25 +1,24 @@
 <!-- @author Akankshi Gupta <akankshigp12345@gmail.com> -->
-  {% extends "base_layout.html" %}
+{% extends "base_layout.html" %}
 
-  {% block content %}
-  {% load static %}
-  
-  <link rel="stylesheet" href="{% static 'stylesheets/home.css' %}">
-  </head>
-  
-  <body>
-  
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'stylesheets/home.css' %}">
+
+</head>
+
+<body>
+  <div class="container-fluid">
+    <a href="/account/view/{{user}}">
+
+    </a>
+
+
+    <br><br>
     <div class="container-fluid">
-      <!--
-    <form action="/search/1" method="get">
-    <input type="search" name="query" placeholder="Search" id="query">
-    <input type="submit" value="Search">
-  </form>
-  -->
-      <!--Checking for any notification from backend >>>>>>>>>>>>-->
       <br><br>
       {% if messages %}
-  
+
       {% for message in messages %}
       {% if message.tags == 'info' %}
       <div class="alert alert-info alert-dismissible fade show" role="alert">
@@ -31,34 +30,95 @@
         {{ message|safe }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
-  
+
       {% elif message.tags == 'success' %}
       <div class="alert alert-success alert-dismissible fade show" role="alert">
         {{ message|safe }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
-  
+
       {% elif message.tags == 'warning' %}
       <div class="alert alert-warning alert-dismissible fade show" role="alert">
         {{ message|safe }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
-  
+
       {% endif %}
-  
+
       {% endfor %}
-  
+
       {% endif %}
+
+      <div class="container">
+        <!--card-->
+        <div class="card mb-3" style="max-width: 540px;">
+          <div class="row g-0">
+            <div class="col-md-4">
+              <img src="{{user_data.profile_picture_link}}" class="img-fluid rounded-start" alt="...">
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title d-flex">{{ user_data.user.first_name }}
+                  {{user_data.user.last_name}}(@{{user_data.user}})
+                  &nbsp;
+                  {% if user.id != user_data.user.id %}
+                  <a onclick="reportAccount({{user_data.user.id}})"><i id="report-account-{{user_data.user.id}}"
+                      data-bs-toggle="modal" data-bs-target="#report-modal-{{post.post.post_id}}"
+                      class="far fa-flag"></i></a>
+                  {% endif %}
+                </h5>
+
+                <p class="card-text"><small class="text-muted">Joined on
+                    {{user_data.user.date_joined}}</small></p>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Modal for report >>>>>>> -->
+      <div class="modal fade" id="report-modal-{{post.post.post_id}}" tabindex="-1"
+        aria-labelledby="modal-label-{{post.post.post_id}}" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modal-label-{{post.post.post_id}}">User was reported!</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              We'll check this account and if it is against our policy, we will remove it. Thank you so much
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Okay</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- <<<<<<<<<<<<<<<< modal for report-->
+      <!--card test-->
+
+      <!--
+  <form action="/search/1" method="get">
+  <input type="search" name="query" placeholder="Search" id="query">
+  <input type="submit" value="Search">
+</form>
+-->
       <!--Checking for any notification from backend >>>>>>>>>>>>-->
-  
-  
+
+      <!--Checking for any notification from backend >>>>>>>>>>>>-->
+
+
       {% if posts_data|length == 0 %}
       <br>
       We don't have anything to show
-  
+
       {% endif %}
       <br><br>
       <div class="container">
+
+
+
+
         <div class="row row-cols-1 row-cols-md-3 g-4">
           {% for post in posts_data %}
           <!--Testing-->
@@ -71,12 +131,13 @@
                   ...
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton-{{ post.post.post_id }}">
-                  <li><button id="report-post-{{post.post.post_id}}" data-bs-toggle="modal"
-                      data-bs-target="#report-modal-{{post.post.post_id}}" class="dropdown-item">Delete </button></li>
+                  <li><button id="delete-modal-{{post.post.post_id}}" data-bs-toggle="modal"
+                      data-bs-target="#delete-modal{{post.post.post_id}}" class="dropdown-item">Delete
+                    </button></li>
                 </ul>
               </div>
-  
-              <div class="modal fade" id="report-modal-{{post.post.post_id}}" tabindex="-1"
+
+              <div class="modal fade" id="delete-modal{{post.post.post_id}}" tabindex="-1"
                 aria-labelledby="modal-label-{{post.post.post_id}}" aria-hidden="true">
                 <div class="modal-dialog">
                   <div class="modal-content">
@@ -88,15 +149,16 @@
                       Once the post is deleted, can never be restored. Do you want to continue?
                     </div>
                     <div class="modal-footer">
-                      <button type="button" class="btn btn-success" data-bs-dismiss="modal">No, Cancel</button>
+                      <button type="button" class="btn btn-success" data-bs-dismiss="modal">No,
+                        Cancel</button>
                       <a type="button" class="btn btn-danger" href="/post/delete_post/{{post.post.post_id}}">Yes, Delete
                         it</a>
                     </div>
                   </div>
                 </div>
               </div>
-  
-  
+
+
               {% endif %}
               <div class="card-body text-center">
                 <div class="container d-flex flex-column align-items-center ">
@@ -104,7 +166,7 @@
                   <a href="/account/view/{{post.username}}">@{{ post.username }}</a>
                 </div>
                 <br>
-                <h5 class="card-title"> <a href="/post/view/{{ post.post.post_id }}"> {{ post.post.title }}</a></h5>
+                <h5 class="card-title"> <a href="/post/view/{{ post.post.post_id }}"> {{ post.post.title}}</a></h5>
                 <small class="text-secondary"> <time
                     datetime="{{post.post.posted_on}}">{{post.post.posted_on}}</time></small></small>
                 <br> <br>
@@ -114,10 +176,10 @@
                   {% endfor %}
                 </p>
               </div>
-  
+
               <div class="card-footer">
                 <div class="container text-center">
-  
+
                   <!--Support Icons >>>>>>>>>>>>>>>>-->
                   {% if post.already_voted %}
                   <i class="fas fa-check-circle" id="vote-{{post.post.post_id}}" title="Remove Support"
@@ -139,24 +201,27 @@
                   <i class="far fa-bookmark" id="saved-{{post.post.post_id}}"
                     onclick="savePost({{post.post.post_id}})"></i>
                   {% endif %}
-  
+
                   <!--Saved Posts <<<<<<<<<<<<<<<<<-->
                   &nbsp; &nbsp; &nbsp;
                   <!--Report Post >>>>>>>>>>>>>>>>>>>>>>>>-->
                   <i class="far fa-flag" id="report-post-{{post.post.post_id}}" data-bs-toggle="modal"
-                    data-bs-target="#report-modal-{{post.post.post_id}}" onclick="reportPost({{post.post.post_id}})"></i>
-  
+                    data-bs-target="#report-modal-{{post.post.post_id}}"
+                    onclick="reportPost({{post.post.post_id}})"></i>
+
                   <!-- Modal for report >>>>>>> -->
                   <div class="modal fade" id="report-modal-{{post.post.post_id}}" tabindex="-1"
                     aria-labelledby="modal-label-{{post.post.post_id}}" aria-hidden="true">
                     <div class="modal-dialog">
                       <div class="modal-content">
                         <div class="modal-header">
-                          <h5 class="modal-title" id="modal-label-{{post.post.post_id}}">Post was reported!</h5>
+                          <h5 class="modal-title" id="modal-label-{{post.post.post_id}}">Post was reported!
+                          </h5>
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                          We'll check this post and if it is against our policy, we will remove it. Thank you so much
+                          We'll check this post and if it is against our policy, we will remove it. Thank
+                          you so much
                         </div>
                         <div class="modal-footer">
                           <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Okay</button>
@@ -166,469 +231,31 @@
                   </div>
                   <!-- <<<<<<<<<<<<<<<< modal for report-->
                   <!--Report Post<<<<<<<<<<<<<<<<<<<<<<<-->
-  
+
                 </div>
               </div>
             </div>
-  
+
           </div>
-  
           {% endfor %}
-  
-        </div><br>
+
+        </div>
+
+
+        <br>
         {% if not is_last_page %}
         <div class="container text-center">
           <a href="/home/{{ next_page }}" class="btn btn-warning"><i class="fas fa-angle-double-right"></i></a>
         </div>
-  
+
         {% endif %}
         <br> <br>
+
+
+        {% load static %}
+        {% if not is_last_page %}
+        <a href="/account/view/{{ user }}/{{ next_page }}">Next Page</a>
+        {% endif %}
+
         <script src="{% static 'js/home.js' %}"></script>
         {% endblock %}
-        {% extends "base_layout.html" %}
-  
-        {% block content %}
-        {% load static %}
-  
-        </head>
-        <link rel="stylesheet" href="{% static 'stylesheets/home.css' %}">
-        <link rel="stylesheet" href="{% static 'stylesheets/saved_items.css' %}">
-  
-        <body>
-          <div class="container-fluid">
-            <!--Checking for any notification from backend >>>>>>>>>>>>-->
-            <br><br>
-            {% if messages %}
-  
-            {% for message in messages %}
-            {% if message.tags == 'info' %}
-            <div class="alert alert-info alert-dismissible fade show" role="alert">
-              {{ message|safe }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% elif message.tags == 'error' %}
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-              {{ message|safe }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-  
-            {% elif message.tags == 'success' %}
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-              {{ message|safe }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-  
-            {% elif message.tags == 'warning' %}
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-              {{ message|safe }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-  
-            {% endif %}
-  
-            {% endfor %}
-  
-            {% endif %}
-            <!--Checking for any notification from backend >>>>>>>>>>>>-->
-  
-            {% if posts_data|length == 0 %}
-            <br><br>
-            <div class="container d-flex flex-column align-items-center flex-wrap empty-message">
-              <img src="{% static 'images/empty_saved.svg' %}" class="empty-image" alt=""><br> <br>
-              <h3 class="text-center">You don't have anything saved </h3><img class="pleading-face-image"
-                src="{% static 'images/pleading-face.svg' %}" alt="">
-            </div>
-  
-            {% endif %}
-  
-            <div class="container">
-              <div class="row row-cols-1 row-cols-md-3 g-4">
-                {% for post in posts_data %}
-                <!--Testing-->
-                <div class="col">
-                  <div class="card h-100">
-                    {% if user == post.post.author.user %}
-                    <div class="dropdown">
-                      <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton-{{ post.post.post_id }}"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        ...
-                      </button>
-                      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton-{{ post.post.post_id }}">
-                        <li><button id="report-post-{{post.post.post_id}}" data-bs-toggle="modal"
-                            data-bs-target="#report-modal-{{post.post.post_id}}" class="dropdown-item">Delete </button>
-                        </li>
-                      </ul>
-                    </div>
-  
-                    <div class="modal fade" id="report-modal-{{post.post.post_id}}" tabindex="-1"
-                      aria-labelledby="modal-label-{{post.post.post_id}}" aria-hidden="true">
-                      <div class="modal-dialog">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title" id="modal-label-{{post.post.post_id}}">Are you sure?</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body">
-                            Once the post is deleted, can never be restored. Do you want to continue?
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-success" data-bs-dismiss="modal">No, Cancel</button>
-                            <a type="button" class="btn btn-danger" href="/post/delete_post/{{post.post.post_id}}">Yes,
-                              Delete
-                              it</a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-  
-  
-                    {% endif %}
-                    <div class="card-body text-center">
-                      <div class="container d-flex flex-column align-items-center ">
-                        <img src="{{ post.profile_picture_link }}" alt="Profile Picture" class="profile-picture">&nbsp;
-                        <a href="/account/view/{{post.username}}">@{{ post.username }}</a>
-                      </div>
-                      <br>
-                      <h5 class="card-title"> <a href="/post/view/{{ post.post.post_id }}"> {{ post.post.title }}</a></h5>
-                      <small class="text-secondary"> <time
-                          datetime="{{post.post.posted_on}}">{{post.post.posted_on}}</time></small></small>
-                      <br> <br>
-                      <p class="card-text d-flex justify-content-center">
-                        {% for tag in post.tags %}
-                        <small> <a class="text-primary" href="/post/tag/{{tag}}">#{{tag}}</a></small> &nbsp;
-                        {% endfor %}
-                      </p>
-                    </div>
-  
-                    <div class="card-footer">
-                      <div class="container text-center">
-  
-                        <!--Support Icons >>>>>>>>>>>>>>>>-->
-                        {% if post.already_voted %}
-                        <i class="fas fa-check-circle" id="vote-{{post.post.post_id}}" title="Remove Support"
-                          onclick="votePost({{post.post.post_id}})"></i>
-                        <span id="vote-count-{{post.post.post_id}}">{{ post.votes }}</span>
-                        {% else %}
-                        <i class="fas fa-check" id="vote-{{post.post.post_id}}" title="Support"
-                          onclick="votePost({{post.post.post_id}})">
-                        </i>
-                        <span id="vote-count-{{post.post.post_id}}">{{ post.votes }}</span>
-                        {% endif %}
-                        <!--Support Icons <<<<<<<<<<<<<<<<<<<<<-->
-                        &nbsp; &nbsp; &nbsp;
-                        <!--Saved Posts >>>>>>>>>>>>-->
-                        {% if post.is_saved %}
-                        <i class="fas fa-bookmark" id="saved-{{post.post.post_id}}"
-                          onclick="savePost({{post.post.post_id}})"></i>
-                        {% else %}
-                        <i class="far fa-bookmark" id="saved-{{post.post.post_id}}"
-                          onclick="savePost({{post.post.post_id}})"></i>
-                        {% endif %}
-  
-                        <!--Saved Posts <<<<<<<<<<<<<<<<<-->
-                        &nbsp; &nbsp; &nbsp;
-                        <!--Report Post >>>>>>>>>>>>>>>>>>>>>>>>-->
-                        <i class="far fa-flag" id="report-post-{{post.post.post_id}}" data-bs-toggle="modal"
-                          data-bs-target="#report-modal-{{post.post.post_id}}"
-                          onclick="reportPost({{post.post.post_id}})"></i>
-  
-                        <!-- Modal for report >>>>>>> -->
-                        <div class="modal fade" id="report-modal-{{post.post.post_id}}" tabindex="-1"
-                          aria-labelledby="modal-label-{{post.post.post_id}}" aria-hidden="true">
-                          <div class="modal-dialog">
-                            <div class="modal-content">
-                              <div class="modal-header">
-                                <h5 class="modal-title" id="modal-label-{{post.post.post_id}}">Post was reported!</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                  aria-label="Close"></button>
-                              </div>
-                              <div class="modal-body">
-                                We'll check this post and if it is against our policy, we will remove it. Thank you so
-                                much
-                              </div>
-                              <div class="modal-footer">
-                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Okay</button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <!-- <<<<<<<<<<<<<<<< modal for report-->
-                        <!--Report Post<<<<<<<<<<<<<<<<<<<<<<<-->
-  
-                      </div>
-                    </div>
-                  </div>
-  
-                </div>
-  
-                {% endfor %}
-  
-              </div>
-  
-              {% load static %}
-              {% if not is_last_page %}
-              <div class="container text-center">
-                <a href="/home/{{ next_page }}" class="btn btn-warning"><i class="fas fa-angle-double-right"></i></a>
-              </div>
-              {% endif %}
-              <br> <br>
-              <script src="{% static 'js/home.js' %}"></script>
-              {% endblock %}
-  {% extends "base_layout.html" %}
-  
-  {% block content %}
-  {% load static %}
-  <link rel="stylesheet" href="{% static 'stylesheets/home.css' %}">
-  
-  </head>
-  
-  <body>
-    <div class="container-fluid">
-      <a href="/account/view/{{user}}">
-  
-      </a>
-  
-  
-  
-  
-  
-  
-      <br><br>
-      <div class="container-fluid">
-        <br><br>
-        {% if messages %}
-  
-        {% for message in messages %}
-        {% if message.tags == 'info' %}
-        <div class="alert alert-info alert-dismissible fade show" role="alert">
-          {{ message|safe }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% elif message.tags == 'error' %}
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-          {{ message|safe }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-  
-        {% elif message.tags == 'success' %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-          {{ message|safe }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-  
-        {% elif message.tags == 'warning' %}
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-          {{ message|safe }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-  
-        {% endif %}
-  
-        {% endfor %}
-  
-        {% endif %}
-  
-        <div class="container">
-          <!--card-->
-          <div class="card mb-3" style="max-width: 540px;">
-            <div class="row g-0">
-              <div class="col-md-4">
-                <img src="{{user_data.profile_picture_link}}" class="img-fluid rounded-start" alt="...">
-              </div>
-              <div class="col-md-8">
-                <div class="card-body">
-                  <h5 class="card-title d-flex">{{ user_data.user.first_name }} {{ user_data.user.last_name }}(@{{user_data.user}})
-                    &nbsp;
-                    {% if user.id != user_data.user.id %}
-                    <a onclick="reportAccount({{user_data.user.id}})"><i id="report-account-{{user_data.user.id}}"
-                        data-bs-toggle="modal" data-bs-target="#report-modal-{{post.post.post_id}}"
-                        class="far fa-flag"></i></a>
-                    {% endif %}
-                  </h5>
-  
-                  <p class="card-text"><small class="text-muted">Joined on {{user_data.user.date_joined}}</small></p>
-  
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Modal for report >>>>>>> -->
-        <div class="modal fade" id="report-modal-{{post.post.post_id}}" tabindex="-1"
-          aria-labelledby="modal-label-{{post.post.post_id}}" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="modal-label-{{post.post.post_id}}">User was reported!</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                We'll check this account and if it is against our policy, we will remove it. Thank you so much
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Okay</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- <<<<<<<<<<<<<<<< modal for report-->
-        <!--card test-->
-  
-        <!--
-    <form action="/search/1" method="get">
-    <input type="search" name="query" placeholder="Search" id="query">
-    <input type="submit" value="Search">
-  </form>
-  -->
-        <!--Checking for any notification from backend >>>>>>>>>>>>-->
-  
-        <!--Checking for any notification from backend >>>>>>>>>>>>-->
-  
-  
-        {% if posts_data|length == 0 %}
-        <br>
-        We don't have anything to show
-  
-        {% endif %}
-        <br><br>
-        <div class="container">
-  
-  
-  
-  
-          <div class="row row-cols-1 row-cols-md-3 g-4">
-            {% for post in posts_data %}
-            <!--Testing-->
-            <div class="col">
-              <div class="card h-100">
-                {% if user == post.post.author.user %}
-                <div class="dropdown">
-                  <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton-{{ post.post.post_id }}"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                    ...
-                  </button>
-                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton-{{ post.post.post_id }}">
-                    <li><button id="report-post-{{post.post.post_id}}" data-bs-toggle="modal"
-                        data-bs-target="#report-modal-{{post.post.post_id}}" class="dropdown-item">Delete </button></li>
-                  </ul>
-                </div>
-  
-                <div class="modal fade" id="report-modal-{{post.post.post_id}}" tabindex="-1"
-                  aria-labelledby="modal-label-{{post.post.post_id}}" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="modal-label-{{post.post.post_id}}">Are you sure?</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body">
-                        Once the post is deleted, can never be restored. Do you want to continue?
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-success" data-bs-dismiss="modal">No, Cancel</button>
-                        <a type="button" class="btn btn-danger" href="/post/delete_post/{{post.post.post_id}}">Yes, Delete
-                          it</a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-  
-  
-                {% endif %}
-                <div class="card-body text-center">
-                  <div class="container d-flex flex-column align-items-center ">
-                    <img src="{{ post.profile_picture_link }}" alt="Profile Picture" class="profile-picture">&nbsp;
-                    <a href="/account/view/{{post.username}}">@{{ post.username }}</a>
-                  </div>
-                  <br>
-                  <h5 class="card-title"> <a href="/post/view/{{ post.post.post_id }}"> {{ post.post.title }}</a></h5>
-                  <small class="text-secondary"> <time
-                      datetime="{{post.post.posted_on}}">{{post.post.posted_on}}</time></small></small>
-                  <br> <br>
-                  <p class="card-text d-flex justify-content-center">
-                    {% for tag in post.tags %}
-                    <small> <a class="text-primary" href="/post/tag/{{tag}}">#{{tag}}</a></small> &nbsp;
-                    {% endfor %}
-                  </p>
-                </div>
-  
-                <div class="card-footer">
-                  <div class="container text-center">
-  
-                    <!--Support Icons >>>>>>>>>>>>>>>>-->
-                    {% if post.already_voted %}
-                    <i class="fas fa-check-circle" id="vote-{{post.post.post_id}}" title="Remove Support"
-                      onclick="votePost({{post.post.post_id}})"></i>
-                    <span id="vote-count-{{post.post.post_id}}">{{ post.votes }}</span>
-                    {% else %}
-                    <i class="fas fa-check" id="vote-{{post.post.post_id}}" title="Support"
-                      onclick="votePost({{post.post.post_id}})">
-                    </i>
-                    <span id="vote-count-{{post.post.post_id}}">{{ post.votes }}</span>
-                    {% endif %}
-                    <!--Support Icons <<<<<<<<<<<<<<<<<<<<<-->
-                    &nbsp; &nbsp; &nbsp;
-                    <!--Saved Posts >>>>>>>>>>>>-->
-                    {% if post.is_saved %}
-                    <i class="fas fa-bookmark" id="saved-{{post.post.post_id}}"
-                      onclick="savePost({{post.post.post_id}})"></i>
-                    {% else %}
-                    <i class="far fa-bookmark" id="saved-{{post.post.post_id}}"
-                      onclick="savePost({{post.post.post_id}})"></i>
-                    {% endif %}
-  
-                    <!--Saved Posts <<<<<<<<<<<<<<<<<-->
-                    &nbsp; &nbsp; &nbsp;
-                    <!--Report Post >>>>>>>>>>>>>>>>>>>>>>>>-->
-                    <i class="far fa-flag" id="report-post-{{post.post.post_id}}" data-bs-toggle="modal"
-                      data-bs-target="#report-modal-{{post.post.post_id}}"
-                      onclick="reportPost({{post.post.post_id}})"></i>
-  
-                    <!-- Modal for report >>>>>>> -->
-                    <div class="modal fade" id="report-modal-{{post.post.post_id}}" tabindex="-1"
-                      aria-labelledby="modal-label-{{post.post.post_id}}" aria-hidden="true">
-                      <div class="modal-dialog">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title" id="modal-label-{{post.post.post_id}}">Post was reported!</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body">
-                            We'll check this post and if it is against our policy, we will remove it. Thank you so much
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Okay</button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <!-- <<<<<<<<<<<<<<<< modal for report-->
-                    <!--Report Post<<<<<<<<<<<<<<<<<<<<<<<-->
-  
-                  </div>
-                </div>
-              </div>
-  
-            </div>
-            {% endfor %}
-  
-          </div>
-  
-  
-          <br>
-          {% if not is_last_page %}
-          <div class="container text-center">
-            <a href="/home/{{ next_page }}" class="btn btn-warning"><i class="fas fa-angle-double-right"></i></a>
-          </div>
-  
-          {% endif %}
-          <br> <br>
-  
-  
-          {% load static %}
-          {% if not is_last_page %}
-          <a href="/account/view/{{ user }}/{{ next_page }}">Next Page</a>
-          {% endif %}
-  
-          <script src="{% static 'js/home.js' %}"></script>
-          {% endblock %}

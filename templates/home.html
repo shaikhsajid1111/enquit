@@ -71,12 +71,12 @@
                   ...
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton-{{ post.post.post_id }}">
-                  <li><button id="report-post-{{post.post.post_id}}" data-bs-toggle="modal"
-                      data-bs-target="#report-modal-{{post.post.post_id}}" class="dropdown-item">Delete </button></li>
+                  <li><button id="delete-post-{{post.post.post_id}}" data-bs-toggle="modal"
+                      data-bs-target="#delete-modal-{{post.post.post_id}}" class="dropdown-item">Delete </button></li>
                 </ul>
               </div>
   
-              <div class="modal fade" id="report-modal-{{post.post.post_id}}" tabindex="-1"
+              <div class="modal fade" id="delete-modal-{{post.post.post_id}}" tabindex="-1"
                 aria-labelledby="modal-label-{{post.post.post_id}}" aria-hidden="true">
                 <div class="modal-dialog">
                   <div class="modal-content">
