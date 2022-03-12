@@ -1,4 +1,4 @@
- <!-- @author Akankshi Gupta <akankshigp12345@gmail.com> -->
+ <!-- @author Akankshi Gupta <akankshigp12345@gmail.com> --> 
 {% extends "base_layout.html" %}
 
 {% block content %}
@@ -10,6 +10,40 @@
 
 <body>
   <div class="container-fluid">
+    <!--Checking for any notification from backend >>>>>>>>>>>>-->
+    <br><br>
+    {% if messages %}
+
+    {% for message in messages %}
+    {% if message.tags == 'info' %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+      {{ message|safe }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% elif message.tags == 'error' %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {{ message|safe }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    {% elif message.tags == 'success' %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message|safe }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    {% elif message.tags == 'warning' %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      {{ message|safe }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    {% endif %}
+
+    {% endfor %}
+
+    {% endif %}
+    <!--Checking for any notification from backend >>>>>>>>>>>>-->
     <div class="content">
   <form align="center" method="post" >
     {% csrf_token %}<br>
