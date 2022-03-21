@@ -6,17 +6,58 @@
 </head>
 <body>
   <div class="container-fluid">
-<form action="/search/1" method="get">
-  <input type="search" name="query" placeholder="Search" id="query">
-  <input type="submit" value="Search">
-</form>
-{{post_data.author.user.username}}
-{{ post_data.posted_on }}
-<h1>{{ post_data.title }}</h1>
-<h2>{{ post_data.text }}</h2>
-{% for media in medias %}
-<img class="img img-thumbnail" src="{{media.url}}" alt="">
-{% endfor %}
+
+<br>
+
+
+
+<!--Card below-->
+
+<div class="card">
+  <div class="card-body">
+    <h4 class="card-title">{{ post_data.title }}</h4>
+    <p class="card-text">{{ post_data.text }}</p>
+    <p class="card-text"><small class="text-muted">Posted on <time datetime="{{post_data.posted_on|date:'c'}}" id="time-{{post.post.post_id}}">{{post.post.posted_on}}</time></small>
+
+    By <a class="text-decoration-none" href="/account/view/{{post_data.author.user.username}}">@{{post_data.author.user.username}}</a>
+
+  <div id="carouselIndicator" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+      <button type="button" data-bs-target="#carouselIndicator" data-bs-slide-to="0" class="active"
+        aria-current="true" aria-label="Slide 1"></button>
+      <button type="button" data-bs-target="#carouselIndicator" data-bs-slide-to="1"
+        aria-label="Slide 2"></button>
+      <button type="button" data-bs-target="#carouselIndicator" data-bs-slide-to="2"
+        aria-label="Slide 3"></button>
+    </div>
+    <div class="carousel-inner">
+    {% for media in medias %}
+      <div class="carousel-item active">
+        <img src="{{media.url}}" class="d-block w-100" alt="...">
+      </div>
+      {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselIndicator" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselIndicator" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+
+
+  </div>
+  <!--Carousel below-->
+</p>
+
+  <!--Carousel Above-->
+</div>
+<!--Card above-->
+
+
+
 
 <form action="post_comment/{{ post_data.post_id }}" method="post">
   {% csrf_token %}
@@ -58,4 +99,6 @@ Reply : {{ reply.text }}
 <hr>
 <br>
 {% endfor %}
+
+<script src="{% static 'js/home.js' %}"></script>
 {% endblock %}
