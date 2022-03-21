@@ -1,13 +1,13 @@
-from ast import Index
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
+from isort import file
 from users.models import CustomUser
 from .models import Post, Medias, Answer, Vault, Tags, Vote
 import cloudinary  # external library
 import cloudinary.uploader  # external library
 from django.http import HttpResponseRedirect
-
+import mimetypes
 
 @login_required(login_url="/account/login")
 def create_post(request):
@@ -38,10 +38,20 @@ def create_post(request):
         for media in medias:
             # upload media to the cloudinary server
             if post is not None:
-                result = cloudinary.uploader.upload_large(media)  # upload
-                # create object for the uploaded file
-                media_obj = Medias.objects.create(
-                    url=result["url"], public_id=result['public_id'], post=post)
+                filename = media.name
+                filetype = mimetypes.guess_type(filename)
+                if 'video' in filetype[0] or 'image' in filetype[0]:
+                  result = cloudinary.uploader.upload_large(media)  # upload
+                  # create object for the uploaded file
+                  if 'video' in filetype[0]:
+                    media_obj = Medias.objects.create(
+                      url=result["url"], public_id=result['public_id'], post=post,media_type="video")
+                  elif "image" in filetype[0]:
+                    media_obj = Medias.objects.create(
+                      url=result["url"], public_id=result['public_id'], post=post,media_type="image")
+            else:
+              messages.error(request, "Invalid Media Type!")
+              return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
         post.save()  # save to the DB
         for tag in tags.split(" "):
             # split out tags from the given tags

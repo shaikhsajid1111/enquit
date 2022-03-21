@@ -20,6 +20,7 @@ class Post(models.Model):
 class Medias(models.Model):
     public_id = models.TextField(default="")
     url = models.TextField(default="")
+    media_type = models.CharField(max_length=24,null=False)
     post = models.ForeignKey(
         Post, on_delete=models.CASCADE, null=True,  related_name="urls")
 
