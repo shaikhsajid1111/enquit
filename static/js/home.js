@@ -61,13 +61,12 @@ var manipulate = function (id, value) {
     document.getElementById(id).innerHTML = value;
 };
 var updateVoteCount = function (id, upvote) {
+    var vote_count_element = document.getElementById(id);
     if (upvote) {
-        var vote_count_element = document.getElementById(id);
         var increment_count = parseInt(vote_count_element.innerHTML) + 1;
         vote_count_element.innerHTML = increment_count.toString();
     }
     else {
-        var vote_count_element = document.getElementById(id);
         var increment_count = parseInt(vote_count_element.innerHTML) - 1;
         vote_count_element.innerHTML = increment_count.toString();
     }
@@ -217,3 +216,37 @@ var reportAccount = function (account_id) { return __awaiter(_this, void 0, void
         }
     });
 }); };
+var convertDateFormat = function (date, id) {
+    var date_obj = new Date(date);
+    var time_string = date_obj.toDateString().toString().slice(4) + " at " + date_obj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    document.getElementById(id).innerHTML = time_string.toString();
+};
+function Validate() {
+    var upload_element = document.getElementById("upload");
+    for (var i = 0; i < upload_element.files.length; i++) {
+        var filetype = upload_element.files.item(i).type;
+        var file_size = upload_element.files.item(i).size;
+        if (filetype.includes('image') || filetype.includes('video')) {
+            console.log(file_size);
+            if (file_size < 20000000) {
+                return true;
+            }
+            else {
+                upload_element.value = "";
+                alert("File too huge!");
+            }
+        }
+        else {
+            upload_element.value = "";
+            alert("Invalid Media");
+        }
+    }
+}
+document.addEventListener('DOMContentLoaded', function () {
+    var elements = document.querySelectorAll('time');
+    elements.forEach(function (element) {
+        var iso_time = element.getAttribute("datetime");
+        var id = element.getAttribute('id');
+        convertDateFormat(iso_time, id);
+    });
+});
