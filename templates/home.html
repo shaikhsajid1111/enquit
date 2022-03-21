@@ -59,6 +59,56 @@
       {% endif %}
       <br><br>
       <div class="container">
+  
+  
+        <!--Publicationd starts-->
+  
+        <div class="card gedf-card">
+          <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
+              <li class="nav-item">
+                <a class="nav-link active" id="posts-tab" data-toggle="tab" href="#posts" role="tab" aria-controls="posts"
+                  aria-selected="true">Have a question to ask {{user}}?</a>
+              </li>
+  
+            </ul>
+          </div>
+          <div class="card-body">
+            <div class="tab-content" id="myTabContent">
+              <div class="tab-pane fade show active" id="posts" role="tabpanel" aria-labelledby="posts-tab">
+                <div class="form-group">
+                <form method="POST" action="/post/create_post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <label class="sr-only" for="message">post</label>
+                    <input type="text" class="form-control" name="title" placeholder="Title" id="title" required>
+                    <br>
+                    <textarea class="form-control" id="text" name="text" rows="3" placeholder="Description"
+                      required></textarea> <br>
+                    <input type="text" class="form-control" name="tags" placeholder="Enter Tags Separated by Space" required> <br>
+                    <input type="file" onchange="return Validate();" class="form-control" name="medias" id="upload" multiple> <br>
+                </div>
+  
+              </div>
+  
+            </div>
+            <div class="btn-toolbar justify-content-between">
+              <br>
+              <br>
+              <div class="btn">
+                <button type="submit" class="btn btn-primary">Share</button>
+              </div>
+  
+              </form>
+            </div>
+          </div>
+        </div>
+        <br>
+        <!--Publicationd ends-->
+  
+  
+  
+  
+  
         <div class="row row-cols-1 row-cols-md-3 g-4">
           {% for post in posts_data %}
           <!--Testing-->
@@ -105,8 +155,8 @@
                 </div>
                 <br>
                 <h5 class="card-title"> <a href="/post/view/{{ post.post.post_id }}"> {{ post.post.title }}</a></h5>
-                <small class="text-secondary"> <time
-                    datetime="{{post.post.posted_on}}">{{post.post.posted_on}}</time></small></small>
+                <small class="text-secondary"> <time datetime="{{post.post.posted_on|date:'c'}}"
+                    id="time-{{post.post.post_id}}">{{post.post.posted_on}}</time></small></small>
                 <br> <br>
                 <p class="card-text d-flex justify-content-center">
                   {% for tag in post.tags %}
