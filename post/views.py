@@ -274,6 +274,7 @@ def view_by_tag(request, tag, page_number):
             data['medias'] = medias
             data['post'] = post
             data['already_voted'] = already_voted
+            data['tags'] = tags
             data['username'] = post.username()
             data['profile_picture_link'] = post.author.profile_picture_link
             posts_data.append(data)
