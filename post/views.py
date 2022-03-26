@@ -106,7 +106,7 @@ def view_post(request, post_id):
         answers = Answer.objects.filter(post=post, parent=None)
         medias = Medias.objects.filter(post=post)
 
-        temp_data = {}
+        post_data = {}
         user_data = CustomUser.objects.get(
             user=request.user)  # fetch the user from database
         already_voted = Vote.objects.filter(
@@ -115,7 +115,7 @@ def view_post(request, post_id):
           votes = Vote.objects.filter(post=post).count()
         except Vote.DoesNotExist:
               votes = 0
-        temp_data['votes'] = votes
+        post_data['votes'] = votes
         try:
             medias = Medias.objects.filter(post=post)
         except Medias.DoesNotExist:
@@ -125,32 +125,28 @@ def view_post(request, post_id):
             tags = [tagg.text for tagg in tags]
         except Tags.DoesNotExist:
             tags = []
-        temp_data['medias'] = medias
-        temp_data['post'] = post
-        temp_data['already_voted'] = already_voted
-        temp_data['tags'] = tags
-        temp_data['username'] = post.username()
-        temp_data['profile_picture_link'] = post.author.profile_picture_link
-#        data.append(temp_data)
+        post_data['medias'] = medias
+        post_data['post'] = post
+        post_data['already_voted'] = already_voted
+        post_data['tags'] = tags
+        post_data['username'] = post.username()
+        post_data['profile_picture_link'] = post.author.profile_picture_link
+        #traversing answers
+        answer_data = []
         for answer in answers:
-            # traverse through all answers and find their replies as well
-            temp_data = {}
-            temp_data['answer'] = answer
-            replies_list = []
-            try:
-                # find all replies to the parent answer
-                replies = Answer.objects.filter(parent=answer)
-            except:
-                # if error occurs in finding
-                replies = []
-            for reply in replies:
-                # traverse over the replies and save it to the list
-                replies_list.append(reply)
-            temp_data['replies'] = replies_list
- #           data.append(temp_data)  # append the dict into the list
-        print(temp_data)
-        return render(request, "post_details.html", {"post_data": post,
-                                                     "answers": temp_data, "medias": medias, "title": "Website Name - {}".format(post.title)})
+          temp_data = {}
+          temp_data['answer'] = answer
+          replies_list = []
+          try:
+            replies = Answer.objects.filter(parent=answer)
+          except:
+            replies = []
+          for reply in replies:
+            replies_list.append(reply)
+          temp_data['replies'] = replies
+          answer_data.append(temp_data)
+        return render(request, "post_details.html", {"post_data": post_data,
+                                                     "answers": answer_data, "medias": medias, "title": "Website Name - {}".format(post.title)})
 
 
 @login_required
