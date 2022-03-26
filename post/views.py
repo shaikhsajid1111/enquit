@@ -105,7 +105,33 @@ def view_post(request, post_id):
         # find all parent answers, exclude the replies for the answer hence the "parent=None" was passed
         answers = Answer.objects.filter(post=post, parent=None)
         medias = Medias.objects.filter(post=post)
-        data = []
+
+        temp_data = {}
+        user_data = CustomUser.objects.get(
+            user=request.user)  # fetch the user from database
+        already_voted = Vote.objects.filter(
+             user=user_data, post=post) and True or False
+        try:
+          votes = Vote.objects.filter(post=post).count()
+        except Vote.DoesNotExist:
+              votes = 0
+        temp_data['votes'] = votes
+        try:
+            medias = Medias.objects.filter(post=post)
+        except Medias.DoesNotExist:
+            medias = []
+        try:
+            tags = Tags.objects.filter(tag=post)
+            tags = [tagg.text for tagg in tags]
+        except Tags.DoesNotExist:
+            tags = []
+        temp_data['medias'] = medias
+        temp_data['post'] = post
+        temp_data['already_voted'] = already_voted
+        temp_data['tags'] = tags
+        temp_data['username'] = post.username()
+        temp_data['profile_picture_link'] = post.author.profile_picture_link
+#        data.append(temp_data)
         for answer in answers:
             # traverse through all answers and find their replies as well
             temp_data = {}
@@ -121,9 +147,10 @@ def view_post(request, post_id):
                 # traverse over the replies and save it to the list
                 replies_list.append(reply)
             temp_data['replies'] = replies_list
-            data.append(temp_data)  # append the dict into the list
+ #           data.append(temp_data)  # append the dict into the list
+        print(temp_data)
         return render(request, "post_details.html", {"post_data": post,
-                                                     "answers": data, "medias": medias, "title": "Website Name - {}".format(post.title)})
+                                                     "answers": temp_data, "medias": medias, "title": "Website Name - {}".format(post.title)})
 
 
 @login_required
