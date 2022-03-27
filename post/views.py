@@ -136,6 +136,9 @@ def view_post(request, post_id):
         for answer in answers:
           temp_data = {}
           temp_data['answer'] = answer
+          answer_already_voted = Answer_Vote.objects.filter(
+              user=user_data, answer=answer) and True or False
+          temp_data['already_voted'] = answer_already_voted
           replies_list = []
           try:
             answer_votes = Answer_Vote.objects.filter(answer=answer).count()
@@ -150,11 +153,13 @@ def view_post(request, post_id):
               reply_vote_count = Answer_Vote.objects.filter(answer=reply).count()
             except:
               reply_vote_count = 0
-            replies_list.append({'reply':reply,'vote_count':reply_vote_count})
+            reply_already_voted = Answer_Vote.objects.filter(
+              user=user_data, answer=reply) and True or False
+            replies_list.append({'reply':reply,'vote_count':reply_vote_count,'already_voted':reply_already_voted})
           temp_data['replies'] = replies_list
           temp_data['vote_count'] = answer_votes
           answer_data.append(temp_data)
-          print(answer_data)
+          #print(answer_data)
         return render(request, "post_details.html", {"post_data": post_data,
                                                      "answers": answer_data, "medias": medias, "title": "Website Name - {}".format(post.title)})
 
