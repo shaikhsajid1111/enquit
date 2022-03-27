@@ -3,7 +3,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from isort import file
 from users.models import CustomUser
-from .models import Post, Medias, Answer, Vault, Tags, Vote
+from .models import Answer_Vote, Post, Medias, Answer, Vault, Tags, Vote
 import cloudinary  # external library
 import cloudinary.uploader  # external library
 from django.http import HttpResponseRedirect
@@ -138,13 +138,23 @@ def view_post(request, post_id):
           temp_data['answer'] = answer
           replies_list = []
           try:
+            answer_votes = Answer_Vote.objects.filter(answer=answer).count()
+          except Answer_Vote.DoesNotExist:
+            answer_votes = 0
+          try:
             replies = Answer.objects.filter(parent=answer)
           except:
             replies = []
           for reply in replies:
-            replies_list.append(reply)
-          temp_data['replies'] = replies
+            try:
+              reply_vote_count = Answer_Vote.objects.filter(answer=reply).count()
+            except:
+              reply_vote_count = 0
+            replies_list.append({'reply':reply,'vote_count':reply_vote_count})
+          temp_data['replies'] = replies_list
+          temp_data['vote_count'] = answer_votes
           answer_data.append(temp_data)
+          print(answer_data)
         return render(request, "post_details.html", {"post_data": post_data,
                                                      "answers": answer_data, "medias": medias, "title": "Website Name - {}".format(post.title)})
 
