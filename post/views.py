@@ -145,7 +145,7 @@ def view_post(request, post_id):
           except Answer_Vote.DoesNotExist:
             answer_votes = 0
           try:
-            replies = Answer.objects.filter(parent=answer)
+            replies = Answer.objects.filter(parent=answer)[:5]
           except:
             replies = []
           for reply in replies:
