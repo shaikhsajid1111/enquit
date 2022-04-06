@@ -1,0 +1,29 @@
+.content{
+    width:600px;
+   
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+   
+
+}
+input[type=username] , input[type=password]{
+    border-color:#0a0a0a;
+    border-radius: 4px;
+    padding: 10px 20px;
+    margin: 8px 0;
+    border-width:2px;
+}
+input[type=submit]{
+    background-color:#1b1919 ;
+    color:rgb(246, 240, 240) ;
+    padding: 8px 25px;
+    margin: 4px 0;
+    
+    border-width: 0;
+    font-weight:bold;
+  }
+  input[type="submit"]:hover {
+    border: 1px solid #010101;
+  }
