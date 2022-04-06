@@ -2,16 +2,21 @@
 
 {% block content %}
 {% load static %}
-
+<link rel="stylesheet" href="../static/stylesheets/delete_user.css">
 </head>
+
+</style>
 <body>
-  <div class="container-fluid">
-<form method="post">
+  <div class="content">
+  <div  class="container-fluid" >        
+<form align="center" method="post">
     {% csrf_token %}
-    <input type="username" placeholder="Username" name="username" id="username">
-    <input type="password" placeholder="Password" name="password" id="password">
+    <input type="username" placeholder="Username" name="username" id="username" ><br>
+    <input type="password" placeholder="Password" name="password" id="password" ><br>
     <input type="submit" value="Delete">
-  </form>
+  </form></div></div>
+
+  
 
   {% for message in messages %}
   <div class="alert alert-{{ message.tags }}">
