@@ -2,103 +2,250 @@
 
 {% block content %}
 {% load static %}
+<link rel="stylesheet" href="{% static 'stylesheets/home.css' %}">
 
 </head>
+
 <body>
   <div class="container-fluid">
 
-<br>
+    <br>
 
 
 
-<!--Card below-->
+    <!--Card below-->
 
-<div class="card">
-  <div class="card-body">
-    <h4 class="card-title">{{ post_data.title }}</h4>
-    <p class="card-text">{{ post_data.text }}</p>
-    <p class="card-text"><small class="text-muted">Posted on <time datetime="{{post_data.posted_on|date:'c'}}" id="time-{{post.post.post_id}}">{{post.post.posted_on}}</time></small>
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">{{ post_data.post.title }}</h4>
+        <p class="card-text">{{ post_data.post.text }}</p>
+        <p class="card-text"><small class="text-muted">Posted on <time datetime="{{post_data.post.posted_on|date:'c'}}"
+              id="time-{{post_data.post_id}}">{{post.posted_on}}</time>
+        </p>
+        By <a class="text-decoration-none"
+          href="/account/view/{{post_data.post.author.user.username}}">@{{post_data.post.author.user.username}}</a>
+        </small>
 
-    By <a class="text-decoration-none" href="/account/view/{{post_data.author.user.username}}">@{{post_data.author.user.username}}</a>
 
-  <div id="carouselIndicator" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-indicators">
-      <button type="button" data-bs-target="#carouselIndicator" data-bs-slide-to="0" class="active"
-        aria-current="true" aria-label="Slide 1"></button>
-      <button type="button" data-bs-target="#carouselIndicator" data-bs-slide-to="1"
-        aria-label="Slide 2"></button>
-      <button type="button" data-bs-target="#carouselIndicator" data-bs-slide-to="2"
-        aria-label="Slide 3"></button>
-    </div>
-    <div class="carousel-inner">
-    {% for media in medias %}
-      <div class="carousel-item active">
-        <img src="{{media.url}}" class="d-block w-100" alt="...">
       </div>
-      {% endfor %}
+      <!--Carousel-->
+
+      <div id="carouselControl" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          {% if post_data.medias|length == 1 %}
+          {% if media.media_type == 'image' %}
+          <img src="{{media.url}}" class="d-block w-100" alt="...">
+          {% else %}
+          <video src="{{media.url}}"></video>
+          {% endif %}
+          {% endif %}
+
+          {% if post_data.medias|length > 1 %}
+          <div class="carousel-item active">
+            {% if post_data.medias.0.media_type == "image" %}
+            <img src="{{post_data.medias.0.url}}" class="d-block w-100" alt="...">
+            {% else %}
+              <div class="ratio ratio-16x9ratio ratio-16x9">
+                <iframe class="embed-responsive-item" src="{{post_data.medias.0.url}}" allowfullscreen></iframe>
+              </div>
+            {% endif %}
+          </div>
+
+          {% for media in post_data.medias %}
+          {% if forloop.first is False %}
+          <div class="carousel-item">
+            {% if media.media_type == "image"%}
+            <img src="{{media.url}}" class="d-block w-100" alt="...">
+            {% else %}
+            <div class="ratio ratio-16x9">
+              <iframe class="embed-responsive-item" src="{{post_data.medias.0.url}}" allowfullscreen></iframe>
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+          {% endfor %}
+          {% endif %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselControl" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselControl" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+      <!--Carousel-->
+
+      <div class="card-footer">
+        <div class="text-center">
+          <!--Support Icons >>>>>>>>>>>>>>>>-->
+          {% if post_data.already_voted %}
+          <i class="fas fa-check-circle" id="vote-{{post_data.post.post_id}}" title="Remove Support"
+            onclick="votePost({{ post_data.post.post_id }})"></i>
+          <span id="vote-count-{{ post_data.post.post_id }}">{{ post_data.votes }}</span>
+          {% else %}
+          <i class="fas fa-check" id="vote-{{post_data.post.post_id}}" title="Support"
+            onclick="votePost({{ post_data.post.post_id }})">
+          </i>
+          <span id="vote-count-{{post_data.post.post_id}}">{{ post_data.votes }}</span>
+          {% endif %}
+          <!--Support Icons <<<<<<<<<<<<<<<<<<<<<-->
+          &nbsp; &nbsp; &nbsp;
+          <!--Report Post >>>>>>>>>>>>>>>>>>>>>>>>-->
+          <i class="far fa-flag" id="report-post-{{post_data.post.post_id}}" data-bs-toggle="modal"
+            data-bs-target="#report-modal-{{post.post.post_id}}" onclick="reportPost({{post_data.post.post_id}})"></i>
+
+          <!-- Modal for report >>>>>>> -->
+          <div class="modal fade" id="report-modal-{{post.post.post_id}}" tabindex="-1"
+            aria-labelledby="modal-label-{{post.post.post_id}}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="modal-label-{{post_data.post.post_id}}">Post was reported!</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  We'll check this post and if it is against our policy, we will remove it. Thank you so much
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Okay</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- <<<<<<<<<<<<<<<< modal for report-->
+          <!--Report Post<<<<<<<<<<<<<<<<<<<<<<<-->
+
+        </div>
+      </div>
+
+
+
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselIndicator" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselIndicator" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Next</span>
-    </button>
-  </div>
-
-
-  </div>
-  <!--Carousel below-->
-</p>
-
-  <!--Carousel Above-->
-</div>
-<!--Card above-->
+    <!--Card above-->
 
 
 
+    <br>
+    <form action="post_comment/{{ post_data.post.post_id }}" class="form-group" method="post">
+      {% csrf_token %}
+      <textarea type="text" name="text" class="form-control" placeholder="Write answer" required></textarea>
+      <br>
+      <input type="submit" class="btn btn-primary" value="Post Answer">
+    </form>
 
-<form action="post_comment/{{ post_data.post_id }}" method="post">
-  {% csrf_token %}
-  <input type="text" name="text" placeholder="Write Answer">
-  <input type="hidden" name="sno" value="{{post_data.post_id}}">
-  <input type="submit" value="Post Answer">
-</form>
+    <br>
+    {% for answer in answers %}
+    <hr>
 
-Answers:
-<br>
-{% for answer in answers %}
-<hr>
-{{ answer.answer.text }}
+    <div class="card h-100">
+      {% if answer.answer.user.user == user %}
+      <div class="dropdown">
+        <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton-{{ answer.answer.id }}"
+          data-bs-toggle="dropdown" aria-expanded="false">
+          ...
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton-{{ answer.answer.id }}">
+          <li><button id="delete-post-{{answer.answer.id}}" data-bs-toggle="modal"
+              data-bs-target="#delete-modal-{{answer.answer.id}}" class="dropdown-item">Delete </button></li>
+        </ul>
+      </div>
+
+      <div class="modal fade" id="delete-modal-{{answer.answer.id}}" tabindex="-1"
+        aria-labelledby="modal-label-{{answer.answer.id}}" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modal-label-{{answer.answer.id}}">Are you sure?</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              Once the answer is deleted, can never be restored. Do you want to continue?
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-success" data-bs-dismiss="modal">No, Cancel</button>
+              <a type="button" class="btn btn-danger" href="/post/delete_answer/{{answer.answer.id}}">Yes, Delete
+                it</a>
+            </div>
+          </div>
+        </div>
+      </div>
 
 
-{% if answer.answer.user.user == user %}
-<a href="/post/delete_answer/{{ answer.answer.id }}" class="text-danger">Delete</a>
-{% endif %}
-<a href="/api/vote_answer/{{ answer.answer.id }}">Vote</a>
-<a href="/api/report_answer/{{ answer.answer.id }}">Report</a>
-<form action="post_comment/{{ post_data.post_id }}" method="post">
-  {% csrf_token %}
-  <input type="hidden" name="parentSno" value="{{ answer.answer.id }}">
-  <input type="text" name="text" placeholder="Reply to {{ answer.answer.user.user }}">
-  <input type="submit" value="Post reply">
-</form>
-<br>
+      {% endif %}
+      <div class="container-fluid">
+        <div class="card-footer row">
+          <div class="col">
+            <small> @{{ answer.answer.username }}:</small>
+          </div>
+          <!--Support Icons >>>>>>>>>>>>>>>>-->
+          <div class="col d-flex flex-row-reverse">
+            {% if answer.already_voted %}
+            <i class="fas fa-check-circle" id="answer-{{answer.answer.id}}" title="Remove Support"
+              onclick="voteAnswer({{ answer.answer.id }})"></i>
+            {% else %}
+            <i class="fas fa-check" id="answer-{{answer.answer.id}}" title="Support"
+              onclick="voteAnswer({{answer.answer.id}})">
+            </i>
+            {% endif %}
+            <!--Support Icons <<<<<<<<<<<<<<<<<<<<<-->
+            &nbsp; &nbsp; &nbsp;
+            <!--Report Post >>>>>>>>>>>>>>>>>>>>>>>>-->
+            <i class="far fa-flag" id="report-answer-{{answer.answer.id}}" data-bs-toggle="modal"
+              data-bs-target="#report-modal-{{answer.answer.id}}" onclick="reportAnswer({{answer.answer.id}})"></i>
 
-{% for reply in answer.replies %}
-Reply : {{ reply.text }}
-{% if reply.user.user == user %}
-<a href="/post/delete_answer/{{ reply.id }}">Delete</a>
-{% endif %}
-<a href="/api/vote_answer/{{ reply.id }}">Vote</a>
-<a href="/api/report_answer/{{ reply.id }}">Report</a>
+            <!-- Modal for report >>>>>>> -->
+            <div class="modal fade" id="report-modal-{{post.post.post_id}}" tabindex="-1"
+              aria-labelledby="modal-label-{{post.post.post_id}}" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="modal-label-{{post.post.post_id}}">Post was reported!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    We'll check this post and if it is against our policy, we will remove it. Thank you so much
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Okay</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--Report modal ends-->
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <p class="card-text"> {{answer.answer.text}} </a></p>
+        <small class="text-secondary"> On
+          <time datetime="{{answer.answer.timestamp|date:'c'}}"
+            id="time-{{answer.answer.id}}">{{answer.answer.timestamp}}</time>
+        </small>
 
-<br>
-{% endfor %}
-<hr>
-<br>
-{% endfor %}
+        &nbsp; &nbsp; &nbsp;
+        <form action="post_comment/{{ post_data.post.post_id }}" class="form-group" method="post">
+          {% csrf_token %}
+          <textarea type="text" name="text" class="form-control" placeholder="Reply"></textarea>
+          <input type="hidden" name="parentSno" value="{{answer.answer.id}}">
+          <br>
+          <input type="submit" class="btn btn-primary" value="Post Reply">
+        </form>
+      </div>
+      <div class="footer replies" id="load-replies-{{answer.answer.id}}">
+        <!--Replies will be inserted here via JS-->
+        <!--Replies will be inserted here via JS-->
+      </div>
+      {% if answer.replies|length > 0 %}
+      <button class="btn" onclick="fetchComment({{answer.answer.id}},1,'{{user}}')" type="button" data-toggle="collapse"
+        data-target="#collapseExample" id="load-replies-button-{{answer.answer.id}}"  aria-expanded="false" aria-controls="collapseExample">
+        Load Comments
+      </button>
+      {% endif %}
+    </div>
 
-<script src="{% static 'js/home.js' %}"></script>
-{% endblock %}
+    {% endfor %}
+
+    <script src="{% static 'js/home.js' %}"></script>
+    {% endblock %}
