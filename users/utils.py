@@ -1,5 +1,5 @@
 try:
-  import requests
+  import requests,re
 except ModuleNotFoundError:
   print("Download dependencies first!")
 
