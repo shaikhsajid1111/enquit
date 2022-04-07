@@ -1,14 +1,13 @@
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
-from isort import file
 from users.models import CustomUser
 from .models import Answer_Vote, Post, Medias, Answer, Vault, Tags, Vote
 import cloudinary  # external library
 import cloudinary.uploader  # external library
 from django.http import HttpResponseRedirect
 import mimetypes
-
+from django.conf import settings
 @login_required(login_url="/account/login")
 def create_post(request):
     """function to create post"""
@@ -161,7 +160,7 @@ def view_post(request, post_id):
           answer_data.append(temp_data)
           #print(answer_data)
         return render(request, "post_details.html", {"post_data": post_data,
-                                                     "answers": answer_data, "medias": medias, "title": "Website Name - {}".format(post.title)})
+                                                     "answers": answer_data, "medias": medias, "title": "{} - {}".format(settings.APP_NAME,post.title)})
 
 
 @login_required
@@ -259,7 +258,8 @@ def view_saved(request, page_number):
             if len(posts_data) == 0:
                 is_last_page = True
                 # send the data to home page as well
-            return render(request, "saved_items.html", {"posts_data": posts_data, "user_data": user_data, "next_page": int(page_number)+1, "is_last_page": is_last_page})
+            return render(request, "saved_items.html", {"posts_data": posts_data, "user_data": user_data, "next_page": int(page_number)+1,
+            "is_last_page": is_last_page,"title":"Saved of post's of @{}".format(user)})
         else:
             # if the user is unauthenticated
             messages.warning(request, "Only Registered user allowed")
@@ -318,4 +318,4 @@ def view_by_tag(request, tag, page_number):
             posts_data.append(data)
             # send the data to home page as well
 
-        return render(request, "home.html", {"user_data": user_data, "posts_data": (posts_data), "title": "Website Name - #{}".format(tag), "is_last_page": is_last_page})
+        return render(request, "home.html", {"user_data": user_data, "posts_data": (posts_data), "title": "{} - #{}".format(settings.APP_NAME,tag), "is_last_page": is_last_page})

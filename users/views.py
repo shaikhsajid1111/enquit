@@ -18,6 +18,7 @@ import environ  # external library
 from post.models import Post, Medias,Vote,Tags
 import cloudinary.uploader
 from faker import Faker
+from django.conf import settings
 # To read environment variable
 env = environ.Env()
 environ.Env.read_env()
@@ -239,7 +240,7 @@ def view_user(request, username, page_number):
                 data['profile_picture_link'] = post.author.profile_picture_link
                 posts_data.append(data)
             # send the data to home page as well
-            return render(request, "view_user.html", {"user_data": user_data, "posts_data": (posts_data), "title": "Website Name - @{}".format(username), "next_page": int(page_number)+1,"is_last_page":is_last_page})
+            return render(request, "view_user.html", {"user_data": user_data, "posts_data": (posts_data), "title": "{} - @{}".format(settings.APP_NAME,username), "next_page": int(page_number)+1,"is_last_page":is_last_page})
         else:
             # if the user is unauthenticated
             messages.warning(request, "Only Registered user allowed")
