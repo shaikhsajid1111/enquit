@@ -14,6 +14,5 @@ def get_image(gender,age):
     print("Get Image: ",ex)
 
 def password_is_valid(string):
-  return len(string) > 5
-  #return True if (re.fullmatch(r'^[A-Za-z0-9@#$%^&+=]{8,}$',string)) else False
+  return True if (re.fullmatch(r'^[A-Za-z0-9@#$%^&+=]{8,}$',string)) else False
 

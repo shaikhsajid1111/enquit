@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from post.models import Post, Vote, Tags, Medias, Vault
 from django.db.models import Q
-
+from django.conf import settings
 
 @login_required
 def blank_route(request):
@@ -62,7 +62,7 @@ def home(request, page_number):
                 data['profile_picture_link'] = post.author.profile_picture_link
                 posts_data.append(data)
             # send the data to home page as well
-            return render(request, "home.html", {"user_data": user_data, "posts_data": (posts_data), "title": "Website Name", "next_page": int(page_number)+1, "is_last_page": is_last_page})
+            return render(request, "home.html", {"user_data": user_data, "posts_data": (posts_data), "title": "{}".format(settings.APP_NAME), "next_page": int(page_number)+1, "is_last_page": is_last_page})
         else:
             # if the user is unauthenticated
             messages.warning(request, "Only Registered user allowed")

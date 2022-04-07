@@ -1,10 +1,6 @@
 from django.contrib import admin
-
-from api.views import report_account
-
 # Register your models here.
 from .models import Post, Medias, Vote, Post_Report, Answer, ReportOfAnswer
-from django.db.models import Count
 class PostAdmin(admin.ModelAdmin):
   list_display = ('post_id', 'username', 'posted_on', 'text', 'report_count')
   search_field = ['text','author']
