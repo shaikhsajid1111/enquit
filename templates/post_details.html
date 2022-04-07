@@ -33,11 +33,15 @@
       <div id="carouselControl" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
           {% if post_data.medias|length == 1 %}
-          {% if media.media_type == 'image' %}
-          <img src="{{media.url}}" class="d-block w-100" alt="...">
-          {% else %}
-          <video src="{{media.url}}"></video>
-          {% endif %}
+          <div class="carousel-item active">
+            {% if post_data.medias.0.media_type == "image" %}
+            <img src="{{post_data.medias.0.url}}" class="d-block w-100" alt="...">
+            {% else %}
+            <div class="ratio ratio-16x9ratio ratio-16x9">
+              <iframe class="embed-responsive-item" src="{{post_data.medias.0.url}}" allowfullscreen></iframe>
+            </div>
+            {% endif %}
+          </div>
           {% endif %}
 
           {% if post_data.medias|length > 1 %}
