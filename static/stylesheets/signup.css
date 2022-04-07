@@ -1,0 +1,44 @@
+body {
+    background-image:url("../images/backgound-image.jpg");
+    height:100vh;
+    background-position: center;
+    background-repeat: none !important;
+    background-size: cover;
+    background-attachment: fixed;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .content{
+    width:600px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: rgb(251, 248, 248);
+    background-color: rgba(255, 255, 255, 0.995);
+  }
+  input[type=username] , input[type=password] , input[type=email] , select[name=gender] , input[type=number]{
+    border-color:#0a0a0a;
+    border-radius: 4px;
+    padding: 10px 20px;
+    margin: 8px 0;
+    border-width:1px;
+  }
+  input[type=submit]{
+    background-color:#1c1c1b ;
+    color:rgb(241, 234, 234) ;
+    padding: 8px 25px;
+    margin: 4px 0;
+    border-color: #000000;
+    border-width: 0;
+    font-weight:bold;
+  }
+  input[type="submit"]:hover {
+    border: 1px solid #000000;
+  }
+  h1 {
+    text-align:center; 
+    color:black; 
+    font-weight: bold;
+}
+    
