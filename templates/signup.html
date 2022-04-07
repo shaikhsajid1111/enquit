@@ -9,22 +9,23 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 <title>{{ title }} </title>
 
-
+<link rel="stylesheet" href="../static/stylesheets/signup.css">
 </head>
-<body>
+<body><div class="content">
   <div class="container-fluid">
-  <form method="post">
+  <form align="center" method="post"><br>
+    <h1>Signup</h1>
     {% csrf_token %}
-    <input type="email" placeholder="Email" name="email" id="email">
-    <input type="password" placeholder="Password" name="password" id="password">
-    <input type="password" placeholder="Enter Password Again" name="confirm_password" id="confirm_password">
+    <input type="email" placeholder="Email" name="email" id="email" size="40"><br>
+    <input type="password" placeholder="Password" name="password" id="password" size="40"><br>
+    <input type="password" placeholder="Enter Password Again" name="confirm_password" id="confirm_password" size="40"><br>
     <select name="gender" id="cars">
       <option value="Male">Male</option>
       <option value="Female">Female</option>
     </select>
-    <input type="number" name="age" id="age" placeholder="Age">
+    <input type="number" name="age" id="age" placeholder="Age"><br><br>
     <input type="submit" value="Sign Up">
-  </form>
+  </form></div>
 
   {% for message in messages %}
   <div >
