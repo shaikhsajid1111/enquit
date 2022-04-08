@@ -61,10 +61,14 @@ def log_out(request):
 @login_required
 def delete_user(request):
     if request.method == "GET":  # if the request for account delection is GET method, redirect them to delete page only
-        return render(request, "delete_user.html")
+        return render(request, "delete_user.html",{'title':'Delete My Account'})
     if request.method == "POST":  # if the form have been submitted with POST request
         # fetch the username from the submitted form
         username = request.POST['username']
+        if request.user.username != username:
+          messages.error(
+              request, "Invalid Access!, Can't delete the account")
+          return redirect("/account/delete")
         # fetch the password from the submitted form
         password = request.POST['password']
         # authenticate if the credentials are valid
